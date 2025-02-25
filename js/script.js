@@ -138,9 +138,16 @@ function scrollActive() {
 window.addEventListener('scroll', scrollActive)
 
 
+const serviceID = process.env.EMAILJS_SERVICE_ID;
+const templateID = process.env.EMAILJS_TEMPLATE_ID;
+const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+
 // Email
 function sendEmail(event) {
     event.preventDefault();
+
+    // Initialize EmailJS with Public Key
+    emailjs.init(publicKey);
   
     const name = document.getElementById('message-name').value;
     const email = document.getElementById('message-email').value;
@@ -153,10 +160,13 @@ function sendEmail(event) {
         "message-subject": subject,
         "message": message,
       };
-  
+
     // call EmailJS API
     emailjs
-      .send('service_kdbzuef', 'template_7bu8zhp', templateParams)
+      .send(
+        serviceID, 
+        templateID, 
+        templateParams)
       .then(
         function(response) {
           alert('Message sent successfully!');
