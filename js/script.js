@@ -137,3 +137,37 @@ function scrollActive() {
 }
 window.addEventListener('scroll', scrollActive)
 
+
+// Email
+function sendEmail(event) {
+    event.preventDefault();
+  
+    const name = document.getElementById('message-name').value;
+    const email = document.getElementById('message-email').value;
+    const subject = document.getElementById('message-subject').value;
+    const message = document.getElementById('message-content').value;
+  
+    const templateParams = {
+        "message-name": name,
+        "message-email": email,
+        "message-subject": subject,
+        "message": message,
+      };
+  
+    // call EmailJS API
+    emailjs
+      .send('service_kdbzuef', 'template_7bu8zhp', templateParams)
+      .then(
+        function(response) {
+          alert('Message sent successfully!');
+          console.log('SUCCESS!', response.status, response.text);
+          // empty form
+          document.querySelector('.cf').reset();
+        },
+        function(error) {
+          alert('Failed to send message. Please try again later.');
+          console.log('FAILED...', error);
+        }
+      );
+  }
+

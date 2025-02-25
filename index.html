@@ -56,6 +56,13 @@
       href="css/style.css"
     />
 
+    <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script type="text/javascript">
+  (function() {
+    emailjs.init("q5akFCwAsNf96nReE");
+  })();
+</script>
+
     <title>Huizhirong (Jason) Guo</title>
   </head>
   <body>
@@ -1388,66 +1395,69 @@
             </div>
           </div>
 
-          <!-- FORM -->
-          <div
+          
+            <!-- FORM -->
+            <div
             class="col-lg-6 pl-lg-4 mt-lg-0 mt-6 contact-form"
             id="message-me"
-          >
+            >
             <h2 class="contact__title">
-              Interested to work together? - <span> Let's talk </span>
+            Interested to work together? - <span> Let's talk </span>
             </h2>
 
             <form
-              action="#"
-              method="POST"
-              class="cf"
+            onsubmit="sendEmail(event)"
+            class="cf"
             >
-              <div class="row">
+            <div class="row">
                 <div class="col-lg-6">
-                  <input
+                <input
                     type="text"
-                    name="message-name"
+                    id="message-name"
                     class="form-control form__color mb-30 cf"
                     placeholder="Your Name"
-                  />
+                    required
+                />
                 </div>
                 <div class="col-lg-6">
-                  <input
+                <input
                     type="email"
-                    name="message-email"
+                    id="message-email"
                     class="form-control form__color mb-30 cf"
                     placeholder="Your Email"
-                  />
+                    required
+                />
                 </div>
                 <div class="col-12">
-                  <input
+                <input
                     type="text"
-                    name="message-subject"
+                    id="message-subject"
                     class="form-control form__color mb-30 cf"
                     placeholder="Subject"
-                  />
+                    required
+                />
                 </div>
                 <div class="col-12">
-                  <textarea
-                    name="message"
+                <textarea
+                    id="message-content"
                     class="form-control form__color mb-30 cf"
                     cols="30"
                     rows="5"
                     placeholder="Your Message"
-                  ></textarea>
+                    required
+                ></textarea>
                 </div>
                 <div class="col-12">
-                  <button
+                <button
                     type="submit"
                     class="button button--flex send-message form_button"
-                  >
+                >
                     Send Message
                     <i class="uil uil-message button__icon"></i>
-                  </button>
+                </button>
                 </div>
-              </div>
+            </div>
             </form>
-          </div>
         </div>
       </section>
     </main>
