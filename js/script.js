@@ -81,9 +81,16 @@ console.log("Typewriter effect is working!")
 var swiper = new Swiper(".blog-slider", {
     spaceBetween: 30,
     effect: 'fade',
+    fadeEffect: {
+        crossFade: true
+    },
+    speed: 800,
     loop: true,
-    mousewheel:{
+    mousewheel: {
         invert: false,
+        sensitivity: 0.5,
+        thresholdDelta: 10,
+        eventsTarget: '.blog-slider'
     },
     navigation: {
       nextEl: ".swiper-button-next",
