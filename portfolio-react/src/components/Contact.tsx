@@ -14,7 +14,9 @@ export default function Contact() {
   });
   const [status, setStatus] = useState<FormStatus>('idle');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -25,26 +27,34 @@ export default function Contact() {
     e.preventDefault();
     setStatus('loading');
 
-    // Create mailto link as fallback
-    const mailtoLink = `mailto:${contactInfo.email[0]}?subject=${encodeURIComponent(
-      formData.subject
-    )}&body=${encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`
-    )}`;
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    // Open email client
-    window.location.href = mailtoLink;
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
 
-    // Reset form after a short delay
-    setTimeout(() => {
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
       setTimeout(() => setStatus('idle'), 3000);
-    }, 1000);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 3000);
+    }
   };
 
   return (
-    <section id="contact" className="py-20 lg:py-32 bg-white dark:bg-slate-900">
+    <section
+      id="contact"
+      className="py-20 lg:py-32 bg-white dark:bg-slate-900"
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -79,7 +89,10 @@ export default function Contact() {
                   Call Me
                 </h3>
                 {contactInfo.phone.map((phone, index) => (
-                  <p key={index} className="text-slate-600 dark:text-slate-400">
+                  <p
+                    key={index}
+                    className="text-slate-600 dark:text-slate-400"
+                  >
                     {phone}
                   </p>
                 ))}
@@ -116,10 +129,14 @@ export default function Contact() {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <h3 className="font-heading font-semibold text-xl text-slate-900 dark:text-white mb-6">
-              Interested to work together? – <span className="text-primary">Let's talk</span>
+              Interested to work together? –{' '}
+              <span className="text-primary">Let's talk</span>
             </h3>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
               <div className="grid sm:grid-cols-2 gap-4">
                 <input
                   type="text"
@@ -167,7 +184,11 @@ export default function Contact() {
                 {status === 'loading' ? (
                   <>
                     <span className="animate-spin">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
                         <circle
                           className="opacity-25"
                           cx="12"
