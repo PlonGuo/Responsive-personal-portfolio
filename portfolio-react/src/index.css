@@ -18,12 +18,25 @@
 /* Base styles */
 html {
   scroll-behavior: smooth;
+  background-color: #f8fafc;
+  transition: background-color 0.3s;
+}
+
+html.dark {
+  background-color: #0f172a;
 }
 
 body {
   font-family: var(--font-body);
   margin: 0;
   min-height: 100vh;
+  background-color: #f8fafc;
+  transition: background-color 0.3s;
+}
+
+body.dark,
+html.dark body {
+  background-color: #0f172a;
 }
 
 h1, h2, h3, h4, h5, h6 {
