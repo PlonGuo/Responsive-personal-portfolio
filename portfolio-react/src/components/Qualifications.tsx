@@ -49,7 +49,7 @@ export default function Qualifications() {
                   className="relative pl-12 pb-8 last:pb-0"
                 >
                   {/* Timeline dot */}
-                  <div className="absolute left-0 w-8 h-8 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center">
+                  <div className="absolute left-0 w-8 h-8 rounded-full bg-white dark:bg-slate-900 border-2 border-primary flex items-center justify-center z-10">
                     <span className="text-xs font-bold text-primary">{item.year}</span>
                   </div>
 
@@ -110,7 +110,7 @@ export default function Qualifications() {
                   className="relative pl-12 pb-8 last:pb-0"
                 >
                   {/* Timeline dot */}
-                  <div className="absolute left-0 w-8 h-8 rounded-full bg-secondary/10 border-2 border-secondary flex items-center justify-center">
+                  <div className="absolute left-0 w-8 h-8 rounded-full bg-white dark:bg-slate-900 border-2 border-secondary flex items-center justify-center z-10">
                     <span className="text-xs font-bold text-secondary">{item.year}</span>
                   </div>
 
