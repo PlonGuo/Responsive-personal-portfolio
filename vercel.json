@@ -2,12 +2,19 @@
   "functions": {
     "api/chat.ts": {
       "maxDuration": 30
+    },
+    "api/github-commits.ts": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
     {
       "source": "/api/:path*",
       "destination": "/api/:path*"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }

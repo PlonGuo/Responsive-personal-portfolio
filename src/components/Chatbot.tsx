@@ -1,6 +1,6 @@
 import { useEffect, useRef, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, AlertCircle } from 'lucide-react';
+import { MessageCircle, X, Send, AlertCircle, Bot } from 'lucide-react';
 import { useChatbot } from '../hooks/useChatbot';
 import { formatMessageTime } from '../utils/chatbot-helpers';
 import type { Message } from '../types/chat';
@@ -173,21 +173,49 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Toggle Button */}
-      <motion.button
-        onClick={toggleChat}
-        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full
-          bg-primary hover:bg-primary-dark text-white
-          shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30
-          flex items-center justify-center
-          transition-all duration-200
-          ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Open chat assistant"
+      {/* Toggle Button - Sci-Fi Design */}
+      <motion.div
+        className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
+          isOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'
+        }`}
       >
-        <MessageCircle className="w-6 h-6" />
-      </motion.button>
+        {/* Outer rotating ring */}
+        <div className="absolute inset-0 w-16 h-16 -m-1">
+          <div className="w-full h-full rounded-full border-2 border-dashed border-cyan-400/40 animate-spin-slow" />
+        </div>
+
+        {/* Inner counter-rotating ring */}
+        <div className="absolute inset-0 w-14 h-14">
+          <div className="w-full h-full rounded-full border border-primary/30 animate-spin-slow-reverse" />
+        </div>
+
+        {/* Main button */}
+        <motion.button
+          onClick={toggleChat}
+          className="relative w-14 h-14 rounded-full
+            bg-gradient-to-br from-primary via-accent to-secondary
+            text-white
+            flex items-center justify-center
+            animate-pulse-glow
+            hover:scale-110
+            transition-transform duration-200"
+          whileTap={{ scale: 0.95 }}
+          aria-label="Open chat assistant"
+        >
+          {/* Inner glow effect */}
+          <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white/20 to-transparent" />
+
+          {/* Icon */}
+          <Bot className="w-7 h-7 relative z-10 drop-shadow-lg" />
+        </motion.button>
+
+        {/* Pulsing dot indicator */}
+        <motion.div
+          className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-slate-900"
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        />
+      </motion.div>
 
       {/* Chat Window */}
       <AnimatePresence>

@@ -1,28 +1,20 @@
-import Header from './components/Header';
-import Hero from './components/Hero';
-import About from './components/About';
-import Skills from './components/Skills';
-import Qualifications from './components/Qualifications';
-import Portfolio from './components/Portfolio';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
-import Chatbot from './components/Chatbot';
+import { Routes, Route } from 'react-router-dom';
+import MainLayout from './layouts/MainLayout';
+import HomePage from './pages/HomePage';
+import BlogPage from './pages/BlogPage';
+import BlogPostPage from './pages/BlogPostPage';
+import LabPage from './pages/LabPage';
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-      <Header />
-      <main>
-        <Hero />
-        <About />
-        <Skills />
-        <Qualifications />
-        <Portfolio />
-        <Contact />
-      </main>
-      <Footer />
-      <Chatbot />
-    </div>
+    <Routes>
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="/lab" element={<LabPage />} />
+      </Route>
+    </Routes>
   );
 }
 

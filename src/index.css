@@ -155,3 +155,127 @@ h1, h2, h3, h4, h5, h6 {
   background: #3B82F6;
   color: white;
 }
+
+/* ========================================
+   Lab Page - Sci-Fi Theme Styles
+   ======================================== */
+
+/* Grid pattern background */
+.lab-grid-bg {
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Glowing border effect */
+.lab-glow-border {
+  box-shadow:
+    0 0 20px rgba(16, 185, 129, 0.3),
+    0 0 40px rgba(16, 185, 129, 0.2),
+    0 0 60px rgba(16, 185, 129, 0.1),
+    inset 0 0 20px rgba(16, 185, 129, 0.05);
+}
+
+/* Animated scan line */
+.lab-scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(16, 185, 129, 0.5),
+    transparent
+  );
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+/* Reduced motion for lab animations */
+@media (prefers-reduced-motion: reduce) {
+  .lab-scanline {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ========================================
+   Chatbot Button - Sci-Fi Glow Styles
+   ======================================== */
+
+/* Pulsing outer glow for chatbot button */
+.chatbot-btn-glow {
+  box-shadow:
+    0 0 20px rgba(6, 182, 212, 0.5),
+    0 0 40px rgba(6, 182, 212, 0.3),
+    0 0 60px rgba(59, 130, 246, 0.2);
+}
+
+/* Rotating ring animation */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-slow-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-spin-slow-reverse {
+  animation: spin-slow-reverse 4s linear infinite;
+}
+
+/* Pulse animation for glow */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(6, 182, 212, 0.5),
+      0 0 40px rgba(6, 182, 212, 0.3),
+      0 0 60px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(6, 182, 212, 0.6),
+      0 0 60px rgba(6, 182, 212, 0.4),
+      0 0 80px rgba(59, 130, 246, 0.3);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Reduced motion for chatbot animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow,
+  .animate-spin-slow-reverse,
+  .animate-pulse-glow {
+    animation: none;
+  }
+}
