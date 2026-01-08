@@ -16,10 +16,17 @@ const ALLOWED_ORIGINS = [
   'https://www.plonguo.com',
   'http://localhost:5173',
   'http://localhost:4173',
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
 ];
 
 // --- CORS Validation ---
 function validateCORS(origin: string | undefined): boolean {
+  if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+    return true;
+  }
   return origin ? ALLOWED_ORIGINS.includes(origin) : false;
 }
 
@@ -90,10 +97,9 @@ async function getFromCache(): Promise<CacheRecord | null> {
 
     if (error || !data) return null;
 
-    // Check if cache is expired
     const expiresAt = new Date(data.expires_at);
     if (expiresAt < new Date()) {
-      return null; // Cache expired
+      return null;
     }
 
     return data as CacheRecord;

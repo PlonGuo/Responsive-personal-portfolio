@@ -21,6 +21,13 @@ const ALLOWED_ORIGINS = [
   'https://www.plonguo.com',
   'http://localhost:5173',
   'http://localhost:4173',
+  'http://localhost:3000', // vercel dev default port
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'http://localhost:5176',
+  'http://localhost:3001',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
 ];
 
 // --- SECURITY LAYER 1: Method Validation ---
@@ -30,6 +37,13 @@ function validateMethod(req: VercelRequest): boolean {
 
 // --- SECURITY LAYER 2: CORS Validation ---
 function validateCORS(origin: string | undefined): boolean {
+  // In development, allow all localhost origins
+  if (
+    origin &&
+    (origin.includes('localhost') || origin.includes('127.0.0.1'))
+  ) {
+    return true;
+  }
   return origin ? ALLOWED_ORIGINS.includes(origin) : false;
 }
 
@@ -97,7 +111,8 @@ async function checkRateLimit(
 
     // Check if window expired (1 hour)
     const windowStart = new Date(data.window_start);
-    const windowExpired = now.getTime() - windowStart.getTime() > RATE_LIMIT_WINDOW;
+    const windowExpired =
+      now.getTime() - windowStart.getTime() > RATE_LIMIT_WINDOW;
 
     if (windowExpired) {
       // Reset window
@@ -115,10 +130,16 @@ async function checkRateLimit(
 
     // Check limits
     if (data.request_count >= MAX_REQUESTS_PER_HOUR) {
-      return { allowed: false, reason: 'Request limit exceeded (30/hour). Please try again later.' };
+      return {
+        allowed: false,
+        reason: 'Request limit exceeded (30/hour). Please try again later.',
+      };
     }
     if (data.token_count >= MAX_TOKENS_PER_HOUR) {
-      return { allowed: false, reason: 'Token limit exceeded. Please try again later.' };
+      return {
+        allowed: false,
+        reason: 'Token limit exceeded. Please try again later.',
+      };
     }
 
     // Increment request count
@@ -176,7 +197,10 @@ function validateInput(message: unknown): ValidationResult {
   }
 
   if (message.length > MAX_INPUT_LENGTH) {
-    return { valid: false, error: `Message too long (max ${MAX_INPUT_LENGTH} characters)` };
+    return {
+      valid: false,
+      error: `Message too long (max ${MAX_INPUT_LENGTH} characters)`,
+    };
   }
 
   if (message.trim().length === 0) {
@@ -380,7 +404,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Layer 4: Rate limiting
-    const rateLimitResult = await checkRateLimit(ipAddress, sessionId || 'unknown');
+    const rateLimitResult = await checkRateLimit(
+      ipAddress,
+      sessionId || 'unknown'
+    );
     if (!rateLimitResult.allowed) {
       return res.status(429).json({
         error: rateLimitResult.reason || 'Rate limit exceeded',
@@ -431,7 +458,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.write(`data: [DONE]\n\n`);
 
     // Update token count in background
-    updateTokenCount(ipAddress, sessionId || 'unknown', totalTokens).catch(console.error);
+    updateTokenCount(ipAddress, sessionId || 'unknown', totalTokens).catch(
+      console.error
+    );
 
     res.end();
   } catch (error) {
