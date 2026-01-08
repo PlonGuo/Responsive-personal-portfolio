@@ -89,12 +89,31 @@ Edit `contactInfo` in `src/data/portfolio.ts`
 - Keyboard navigation support
 - Semantic HTML elements
 
+## Supabase Configuration
+
+The project uses Supabase for backend services. Configuration is stored in `.env.local`:
+
+```bash
+# .env.local (NOT committed to Git)
+SUPABASE_PROJECT_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_ACCESS_TOKEN=your-access-token
+```
+
+**Important**:
+- Never commit `.env.local` to Git (already in `.gitignore`)
+- Use Supabase MCP tools when needed for database operations
+- Tokens are available in `.env.local` for local development
+
 ## Deployment
 
 - **Platform**: Vercel
 - **Root**: `.` (project root)
 - **Build**: `pnpm build`
 - **Output**: `dist`
+- **Environment Variables**: Add Supabase keys in Vercel dashboard
+- **Security**: Cloudflare WAF proxy (see [CLOUDFLARE_WAF_SETUP.md](CLOUDFLARE_WAF_SETUP.md))
 
 ## Project Context for AI Assistance
 

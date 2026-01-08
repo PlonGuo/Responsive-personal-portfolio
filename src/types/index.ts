@@ -39,3 +39,6 @@ export interface ContactInfo {
   phone: string[];
   email: string[];
 }
+
+// Chat types
+export * from './chat';

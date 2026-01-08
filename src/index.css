@@ -18,8 +18,11 @@
 /* Base styles */
 html {
   scroll-behavior: smooth;
-  background-color: #f8fafc;
+  background: #f8fafc;
+  background-attachment: fixed;  /* 固定背景,防止 overscroll 白屏 */
   transition: background-color 0.3s;
+  min-height: 100%;
+  overflow-x: hidden;
 }
 
 html.dark {
@@ -32,10 +35,56 @@ body {
   min-height: 100vh;
   background-color: #f8fafc;
   transition: background-color 0.3s;
+  position: relative;
+  overflow-x: hidden;
 }
 
 body.dark,
 html.dark body {
+  background-color: #0f172a;
+}
+
+/* Fix overscroll bounce background - extend much further */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200vh;  /* 扩大到 200vh 覆盖更大的 bounce */
+  left: 0;
+  right: 0;
+  height: 200vh;
+  background-color: #f8fafc;
+  z-index: -9999;
+  pointer-events: none;
+  transition: background-color 0.3s;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -200vh;  /* 扩大到 200vh */
+  left: 0;
+  right: 0;
+  height: 200vh;
+  background-color: #f8fafc;
+  z-index: -9999;
+  pointer-events: none;
+  transition: background-color 0.3s;
+}
+
+body.dark::before,
+body.dark::after {
+  background-color: #0f172a;
+}
+
+/* Additional fix: cover the entire root */
+#root {
+  position: relative;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  transition: background-color 0.3s;
+}
+
+.dark #root {
   background-color: #0f172a;
 }
 

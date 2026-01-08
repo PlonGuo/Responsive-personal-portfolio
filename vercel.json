@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/chat.ts": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     {
       "source": "/api/:path*",
