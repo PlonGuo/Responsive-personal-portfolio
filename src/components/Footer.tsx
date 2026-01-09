@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowUp, Linkedin, Github, Instagram } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { personalInfo, socialLinks } from '../data/portfolio';
 
 // Bluesky icon
@@ -16,13 +17,25 @@ const socialIcons: Record<string, React.ReactNode> = {
   bluesky: <BlueskyIcon />,
 };
 
-const footerLinks = [
+// Links for homepage (hash navigation to sections)
+const homePageLinks = [
   { name: 'About Me', href: '#about' },
   { name: 'My Portfolio', href: '#portfolio' },
   { name: 'Contact Me', href: '#contact' },
 ];
 
+// Links for other pages (route navigation)
+const otherPageLinks = [
+  { name: 'Home', href: '/' },
+  { name: 'Blog', href: '/blog' },
+  { name: 'Lab', href: '/lab' },
+];
+
 export default function Footer() {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  const footerLinks = isHomePage ? homePageLinks : otherPageLinks;
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -72,16 +85,25 @@ export default function Footer() {
           >
             {footerLinks.map((link) => (
               <li key={link.name}>
-                <a
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(link.href);
-                  }}
-                  className="text-white/70 hover:text-white transition-colors cursor-pointer"
-                >
-                  {link.name}
-                </a>
+                {link.href.startsWith('#') ? (
+                  <a
+                    href={link.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick(link.href);
+                    }}
+                    className="text-white/70 hover:text-white transition-colors cursor-pointer"
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link
+                    to={link.href}
+                    className="text-white/70 hover:text-white transition-colors cursor-pointer"
+                  >
+                    {link.name}
+                  </Link>
+                )}
               </li>
             ))}
           </motion.ul>

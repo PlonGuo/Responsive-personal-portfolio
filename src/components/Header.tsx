@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, User, Code2, Briefcase, FolderOpen, Mail, FileText, Beaker } from 'lucide-react';
+import { Menu, X, Home, User, Code2, Briefcase, FolderOpen, Mail, FileText, Beaker, Sun, Moon } from 'lucide-react';
 import avatarImage from '../assets/jason-clipart.jpg';
+import { useTheme } from '../hooks/useTheme';
 
 // Hash links for homepage sections
 const homeSectionItems = [
@@ -25,6 +26,8 @@ export default function Header() {
   const [activeSection, setActiveSection] = useState('home');
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const isLabPage = location.pathname === '/lab';
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -135,8 +138,19 @@ export default function Header() {
               </Link>
             ))}
 
+            {/* Theme Toggle - hide on Lab page */}
+            {!isLabPage && (
+              <button
+                onClick={toggleTheme}
+                className="ml-2 p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              >
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+            )}
+
             {/* Avatar */}
-            <div className="ml-2">
+            <div className="ml-1">
               <img
                 src={avatarImage}
                 alt="Jason Guo"
@@ -147,6 +161,16 @@ export default function Header() {
 
           {/* Mobile Menu Button & Avatar */}
           <div className="flex items-center gap-2">
+            {/* Mobile Theme Toggle - hide on Lab page */}
+            {!isLabPage && (
+              <button
+                onClick={toggleTheme}
+                className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              >
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+            )}
             {/* Mobile Avatar */}
             <img
               src={avatarImage}
