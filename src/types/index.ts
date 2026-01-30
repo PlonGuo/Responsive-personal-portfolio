@@ -27,6 +27,7 @@ export interface Project {
   demoUrl?: string;
   githubUrl?: string;
   technologies: string[];
+  year: number;
 }
 
 export interface SocialLink {

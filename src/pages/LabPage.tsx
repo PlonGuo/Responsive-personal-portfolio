@@ -3,9 +3,28 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ExternalLink, Github, Beaker, ArrowLeft } from 'lucide-react';
 import { projects } from '../data/portfolio';
+import type { Project } from '../types';
 
 export default function LabPage() {
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
+
+  // Group projects by year
+  const projectsByYear = projects.reduce(
+    (acc, project) => {
+      const year = project.year;
+      if (!acc[year]) {
+        acc[year] = [];
+      }
+      acc[year].push(project);
+      return acc;
+    },
+    {} as Record<number, Project[]>
+  );
+
+  // Sort years in descending order
+  const sortedYears = Object.keys(projectsByYear)
+    .map(Number)
+    .sort((a, b) => b - a);
 
   return (
     <div className="min-h-screen bg-[#0a0f1a] relative overflow-hidden">
@@ -69,97 +88,121 @@ export default function LabPage() {
             </p>
           </motion.div>
 
-          {/* Projects Grid */}
+          {/* Timeline */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="space-y-16"
           >
-            {projects.map((project, index) => (
-              <motion.div
-                key={project.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                onMouseEnter={() => setHoveredProject(project.title)}
-                onMouseLeave={() => setHoveredProject(null)}
-                className="group relative"
-              >
-                <div
-                  className={`bg-slate-900/80 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/50 ${
-                    hoveredProject === project.title
-                      ? 'lab-glow-border transform scale-[1.02]'
-                      : ''
-                  }`}
+            {sortedYears.map((year) => (
+              <div key={year} className="relative">
+                {/* Year Header */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="flex items-center gap-4 mb-8"
                 >
-                  {/* Project Image */}
-                  <div className="relative aspect-video overflow-hidden">
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-
-                    {/* Status Badge */}
-                    <div className="absolute top-4 right-4">
-                      <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-mono rounded-full border border-emerald-500/30">
-                        ACTIVE
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
+                    <h2 className="text-4xl font-heading font-bold text-white">
+                      {year}
+                    </h2>
                   </div>
+                  <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/50 to-transparent" />
+                </motion.div>
 
-                  {/* Content */}
-                  <div className="p-6">
-                    <h3 className="text-xl font-heading font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
-                      {project.title}
-                    </h3>
-                    <p className="text-slate-400 text-sm mb-4 line-clamp-2">
-                      {project.description}
-                    </p>
+                {/* Projects Grid for this year */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pl-7">
+                  {projectsByYear[year].map((project, index) => (
+                    <motion.div
+                      key={project.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1 }}
+                      onMouseEnter={() => setHoveredProject(project.title)}
+                      onMouseLeave={() => setHoveredProject(null)}
+                      className="group relative"
+                    >
+                      <div
+                        className={`bg-slate-900/80 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/50 ${
+                          hoveredProject === project.title
+                            ? 'lab-glow-border transform scale-[1.02]'
+                            : ''
+                        }`}
+                      >
+                        {/* Project Image */}
+                        <div className="relative aspect-video overflow-hidden">
+                          <img
+                            src={project.image}
+                            alt={project.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          {/* Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
 
-                    {/* Technologies */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {project.technologies.map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-2 py-1 text-xs font-mono bg-slate-800 text-emerald-400/80 rounded border border-emerald-500/20"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
+                          {/* Status Badge */}
+                          <div className="absolute top-4 right-4">
+                            <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-mono rounded-full border border-emerald-500/30">
+                              ACTIVE
+                            </span>
+                          </div>
+                        </div>
 
-                    {/* Links */}
-                    <div className="flex gap-3">
-                      {project.demoUrl && (
-                        <a
-                          href={project.demoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition-colors text-sm font-medium"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Demo
-                        </a>
-                      )}
-                      {project.githubUrl && (
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium"
-                        >
-                          <Github className="w-4 h-4" />
-                          Code
-                        </a>
-                      )}
-                    </div>
-                  </div>
+                        {/* Content */}
+                        <div className="p-6">
+                          <h3 className="text-xl font-heading font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                            {project.title}
+                          </h3>
+                          <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                            {project.description}
+                          </p>
+
+                          {/* Technologies */}
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {project.technologies.map((tech) => (
+                              <span
+                                key={tech}
+                                className="px-2 py-1 text-xs font-mono bg-slate-800 text-emerald-400/80 rounded border border-emerald-500/20"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Links */}
+                          <div className="flex gap-3">
+                            {project.demoUrl && (
+                              <a
+                                href={project.demoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition-colors text-sm font-medium"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                                Demo
+                              </a>
+                            )}
+                            {project.githubUrl && (
+                              <a
+                                href={project.githubUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium"
+                              >
+                                <Github className="w-4 h-4" />
+                                Code
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </motion.div>
         </div>

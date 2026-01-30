@@ -28,6 +28,8 @@ export const skills: Skill[] = [
   { name: 'TypeScript', icon: 'typescript', category: 'language' },
   { name: 'Python', icon: 'python', category: 'language' },
   { name: 'C++', icon: 'cplusplus', category: 'language' },
+  { name: 'Go', icon: 'go', category: 'language' },
+  { name: 'C#', icon: 'csharp', category: 'language' },
 
   // Frameworks
   { name: 'React', icon: 'react', category: 'framework' },
@@ -36,6 +38,11 @@ export const skills: Skill[] = [
   { name: 'Django', icon: 'django', category: 'framework' },
   { name: 'Tailwind', icon: 'tailwindcss', category: 'framework' },
   { name: 'Vite', icon: 'vite', category: 'framework' },
+  { name: 'Angular', icon: 'angular', category: 'framework' },
+  { name: 'ASP .NET', icon: 'dotnet', category: 'framework' },
+  { name: 'Gin', icon: 'gin', category: 'framework' },
+  { name: 'Electron', icon: 'electron', category: 'framework' },
+  { name: 'Prisma', icon: 'prisma', category: 'framework' },
 
   // Database & Tools
   { name: 'Git', icon: 'git', category: 'tool' },
@@ -47,8 +54,12 @@ export const skills: Skill[] = [
   { name: 'MongoDB', icon: 'mongodb', category: 'tool' },
   { name: 'PostgreSQL', icon: 'postgresql', category: 'tool' },
   { name: 'MySQL', icon: 'mysql', category: 'tool' },
+  { name: 'SQLite', icon: 'sqlite', category: 'tool' },
+  { name: 'Redis', icon: 'redis', category: 'tool' },
   { name: 'Navicat', icon: 'navicat', category: 'tool' },
   { name: 'Claude', icon: 'anthropic', category: 'tool' },
+  { name: 'WebRTC', icon: 'webrtc', category: 'tool' },
+  { name: 'Azure', icon: 'microsoftazure', category: 'tool' },
 
   // Design
   { name: 'Photoshop', icon: 'adobephotoshop', category: 'design' },
@@ -116,20 +127,43 @@ export const experience: Experience[] = [
 ];
 
 export const projects: Project[] = [
+  // 2026 Projects
   {
-    title: 'GitHub Finder',
+    title: 'GoChatroom',
     description:
-      'A web-based application that allows users to search for any GitHub account and browse their profile information.',
-    image: '/images/github-finder.jpg',
-    demoUrl: 'https://github-finder-three-pink.vercel.app/',
-    technologies: ['React', 'GitHub API', 'Tailwind CSS'],
+      'Real-time chat application with React frontend and Go backend, deployed on Vercel + Fly.io',
+    image: '/images/go-chatroom.png',
+    githubUrl: 'https://github.com/PlonGuo/GoChatroom',
+    technologies: ['React', 'Go', 'WebSocket', 'Vercel', 'Fly.io'],
+    year: 2026,
   },
   {
-    title: 'Food E-commerce Platform',
-    description: 'An online store for browsing and purchasing food products.',
-    image: '/images/e-commerce.jpg',
-    githubUrl: 'https://github.com/PlonGuo/Ecommerce-Platform',
-    technologies: ['Python', 'Django', 'Bootstrap', 'SQLite'],
+    title: 'Travel Agent Booking System',
+    description:
+      'A comprehensive booking management system designed for travel agents to track flights, hotels, and insurance payments with customer payment tracking.',
+    image: '/images/travel-agent-booking-system.png',
+    githubUrl: 'https://github.com/PlonGuo/Travel-Agent-Booking-System',
+    technologies: ['React', 'TypeScript', 'Supabase'],
+    year: 2026,
+  },
+  {
+    title: 'Flowboard',
+    description:
+      'Real-time collaborative kanban board with AI assistant and interactive whiteboard. Built with .NET 8 & Angular 17',
+    image: '/images/github-finder.jpg',
+    githubUrl: 'https://github.com/PlonGuo/flowboard',
+    technologies: ['.NET 8', 'Angular 17', 'AI', 'Kanban'],
+    year: 2026,
+  },
+  // 2025 Projects
+  {
+    title: 'Sportlingo Coaching Dashboard',
+    description:
+      'B2B coach dashboard for team management and analytics, enabling coaches to add users to teams, monitor individual progress, and track performance metrics.',
+    image: '/images/coach_dashboard.png',
+    demoUrl: 'https://www.sportlingo.ai/',
+    technologies: ['React', 'Supabase', 'AI', 'TypeScript'],
+    year: 2025,
   },
   {
     title: 'Makeform.ai',
@@ -138,14 +172,25 @@ export const projects: Project[] = [
     image: '/images/makeform.jpg',
     demoUrl: 'https://www.makeform.ai/',
     technologies: ['React', 'Next.js', 'AI', 'TypeScript'],
+    year: 2025,
+  },
+  // Older Projects
+  {
+    title: 'GitHub Finder',
+    description:
+      'A web-based application that allows users to search for any GitHub account and browse their profile information.',
+    image: '/images/github-finder.jpg',
+    demoUrl: 'https://github-finder-three-pink.vercel.app/',
+    technologies: ['React', 'GitHub API', 'Tailwind CSS'],
+    year: 2024,
   },
   {
-    title: 'Sportlingo Coaching Dashboard',
-    description:
-      'An innovative platform that empowers users to easily design and deploy dynamic online forms using AI, enhancing productivity and user engagement.',
-    image: '/images/coach_dashboard.png',
-    demoUrl: 'https://www.sportlingo.ai/',
-    technologies: ['React', 'Supabase', 'AI', 'TypeScript'],
+    title: 'Food E-commerce Platform',
+    description: 'An online store for browsing and purchasing food products.',
+    image: '/images/e-commerce.jpg',
+    githubUrl: 'https://github.com/PlonGuo/Ecommerce-Platform',
+    technologies: ['Python', 'Django', 'Bootstrap', 'SQLite'],
+    year: 2023,
   },
 ];
 
