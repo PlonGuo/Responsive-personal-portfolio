@@ -132,7 +132,17 @@ SUPABASE_ACCESS_TOKEN=your-access-token
 3. SEO (meta tags, semantic HTML)
 4. Bundle size (tree-shaking, minimal deps)
 
+## Sound Notification (macOS)
+
+IMPORTANT: After finishing responding to my request or running a command, run this command to notify me by sound:
+
+```bash
+afplay /System/Library/Sounds/Funk.aiff
+```
+
+This uses macOS's built-in `afplay` command to play system sounds.
+
 ---
 
-**Last Updated**: January 2026
+**Last Updated**: February 2026
 **Skill Used**: `ui-ux-pro-max` for design intelligence

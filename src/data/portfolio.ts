@@ -34,17 +34,19 @@ export const skills: Skill[] = [
   // Frameworks
   { name: 'React', icon: 'react', category: 'framework' },
   { name: 'Next.js', icon: 'nextdotjs', category: 'framework' },
-  { name: 'Node.js', icon: 'nodedotjs', category: 'framework' },
   { name: 'Django', icon: 'django', category: 'framework' },
+  { name: 'FastAPI', icon: 'fastapi', category: 'framework' },
+  { name: 'LangChain', icon: 'langchain', category: 'framework' },
+  { name: 'PydanticAI', icon: 'pydantic', category: 'framework' },
   { name: 'Tailwind', icon: 'tailwindcss', category: 'framework' },
   { name: 'Vite', icon: 'vite', category: 'framework' },
   { name: 'Angular', icon: 'angular', category: 'framework' },
   { name: 'ASP .NET', icon: 'dotnet', category: 'framework' },
   { name: 'Gin', icon: 'gin', category: 'framework' },
   { name: 'Electron', icon: 'electron', category: 'framework' },
-  { name: 'Prisma', icon: 'prisma', category: 'framework' },
 
   // Database & Tools
+  { name: 'Prisma', icon: 'prisma', category: 'tool' },
   { name: 'Git', icon: 'git', category: 'tool' },
   { name: 'GitHub', icon: 'github', category: 'tool' },
   { name: 'Docker', icon: 'docker', category: 'tool' },
@@ -134,6 +136,7 @@ export const projects: Project[] = [
       'Real-time chat application with React frontend and Go backend, deployed on Vercel + Fly.io',
     image: '/images/go-chatroom.png',
     githubUrl: 'https://github.com/PlonGuo/GoChatroom',
+    demoUrl: 'https://frontend-three-pied-39.vercel.app',
     technologies: ['React', 'Go', 'WebSocket', 'Vercel', 'Fly.io'],
     year: 2026,
   },
@@ -150,8 +153,9 @@ export const projects: Project[] = [
     title: 'Flowboard',
     description:
       'Real-time collaborative kanban board with AI assistant and interactive whiteboard. Built with .NET 8 & Angular 17',
-    image: '/images/github-finder.jpg',
+    image: '/images/flowboard-demo.png',
     githubUrl: 'https://github.com/PlonGuo/flowboard',
+    demoUrl: 'https://red-pond-0f305f80f.4.azurestaticapps.net',
     technologies: ['.NET 8', 'Angular 17', 'AI', 'Kanban'],
     year: 2026,
   },
@@ -180,6 +184,7 @@ export const projects: Project[] = [
     description:
       'A web-based application that allows users to search for any GitHub account and browse their profile information.',
     image: '/images/github-finder.jpg',
+    githubUrl: 'https://github.com/PlonGuo/GithubFinder.git',
     demoUrl: 'https://github-finder-three-pink.vercel.app/',
     technologies: ['React', 'GitHub API', 'Tailwind CSS'],
     year: 2024,

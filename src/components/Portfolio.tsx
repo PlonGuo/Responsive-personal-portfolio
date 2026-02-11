@@ -58,6 +58,19 @@ export default function Portfolio() {
                   />
                 </AnimatePresence>
 
+                {/* Active Badge - Only show if project has demo URL */}
+                {currentProject.demoUrl && (
+                  <div className="absolute top-4 right-4 z-10">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/90 backdrop-blur-sm text-white text-sm font-medium rounded-full shadow-lg">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                      </span>
+                      Active
+                    </div>
+                  </div>
+                )}
+
                 {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden" />
               </div>
@@ -94,17 +107,6 @@ export default function Portfolio() {
 
                     {/* Links */}
                     <div className="flex gap-4">
-                      {currentProject.demoUrl && (
-                        <a
-                          href={currentProject.demoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-primary/25 cursor-pointer"
-                        >
-                          Demo
-                          <ExternalLink size={18} />
-                        </a>
-                      )}
                       {currentProject.githubUrl && (
                         <a
                           href={currentProject.githubUrl}
@@ -114,6 +116,17 @@ export default function Portfolio() {
                         >
                           GitHub
                           <Github size={18} />
+                        </a>
+                      )}
+                      {currentProject.demoUrl && (
+                        <a
+                          href={currentProject.demoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-primary/25 cursor-pointer"
+                        >
+                          Demo
+                          <ExternalLink size={18} />
                         </a>
                       )}
                     </div>

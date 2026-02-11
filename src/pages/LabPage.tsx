@@ -143,12 +143,14 @@ export default function LabPage() {
                           {/* Overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
 
-                          {/* Status Badge */}
-                          <div className="absolute top-4 right-4">
-                            <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-mono rounded-full border border-emerald-500/30">
-                              ACTIVE
-                            </span>
-                          </div>
+                          {/* Status Badge - Only show if project has demo URL */}
+                          {project.demoUrl && (
+                            <div className="absolute top-4 right-4">
+                              <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-mono rounded-full border border-emerald-500/30">
+                                ACTIVE
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Content */}
@@ -174,17 +176,6 @@ export default function LabPage() {
 
                           {/* Links */}
                           <div className="flex gap-3">
-                            {project.demoUrl && (
-                              <a
-                                href={project.demoUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition-colors text-sm font-medium"
-                              >
-                                <ExternalLink className="w-4 h-4" />
-                                Demo
-                              </a>
-                            )}
                             {project.githubUrl && (
                               <a
                                 href={project.githubUrl}
@@ -194,6 +185,17 @@ export default function LabPage() {
                               >
                                 <Github className="w-4 h-4" />
                                 Code
+                              </a>
+                            )}
+                            {project.demoUrl && (
+                              <a
+                                href={project.demoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition-colors text-sm font-medium"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                                Demo
                               </a>
                             )}
                           </div>
