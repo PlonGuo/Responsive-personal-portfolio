@@ -273,16 +273,16 @@ STRONGEST TECH STACK:
 WORK EXPERIENCE:
 
 1. Next Play Games Inc. (Startup) - Software Engineer Intern (Sep-Dec 2025, Remote)
-   - Architected full-stack application with Supabase database (RLS policies and proper schema design), Stripe payment integration with automated webhook processing and PCI compliance, and Cloudflare Pages deployment with edge function routing for global performance optimization
+   - Architected full-stack application with Supabase database (RLS policies and proper schema design), Stripe payment integration with automated webhook processing and PCI compliance, and Cloudflare Pages deployment with edge function routing for global performance optimization ensuring secure payment flows
    - Built B2B coach dashboard using React, TypeScript, and Vite enabling team management, individual progress monitoring, and real-time performance analytics with live data synchronization across web and mobile platforms
    - Built cross-platform mobile app with React Native, optimizing component rendering to eliminate redundant re-renders and improving Supabase data fetching performance through query optimization and caching strategies
    - Architected AI-powered coaching features using OpenAI API including automated lesson generation and interactive chatbot. Designed Supabase Edge Functions with automated fine-tuning pipeline retraining GPT-4o mini models weekly or at 50 conversations, utilizing database Views and RLS policies for real-time synchronization
 
 2. Beijing Gesafe WEALTH Advisory Co., Ltd. - Backend Engineer Intern (Jun-Aug 2025, Beijing)
-   - Developed internal workflow automation tools with Django REST framework, reducing manual processing time by 35% and automating daily recurring tasks including report generation, data validation, and email notifications
-   - Built RESTful APIs with Flask and MongoDB, implementing pagination and query optimization for sub-200ms response times across core business endpoints while handling complex aggregation pipelines for financial data. Tested APIs using Postman for endpoint validation and debugging
-   - Designed MySQL database schema with proper indexing strategies, improving report generation speed by 60% and reducing query execution time from 3 seconds to around 1 second for complex analytical queries
-   - Collaborated with cross-functional teams to deliver payment integration, automated reporting, and user dashboard features in Kubernetes Pod environments. Participated in daily stand-ups, sprint planning, and code reviews while coordinating with frontend developers, product managers, and QA engineers
+   - Built RESTful APIs with Flask and MongoDB, implementing pagination and query optimization for sub-200ms response times across core business endpoints while handling complex aggregation pipelines for financial data
+   - Extended MongoDB schema design to support new feature requirements and data structures while maintaining backward compatibility with existing codebase, ensuring zero disruption to production services
+   - Tested and validated API endpoints using Postman for debugging, documentation, and regression testing, collaborating closely with frontend developers and QA team to ensure seamless integration and functionality
+   - Participated in daily stand-ups, sprint planning, and code reviews within Kubernetes Pod deployment environments
 
 3. Previous: China Shipbuilding Orlando Wuxi Software Technology (Jun-Sep 2024), National Supercomputing Center in Wuxi (Jun 2023-Aug 2024)
 
@@ -322,13 +322,10 @@ NOTABLE PROJECTS:
    - GitHub: github.com/PlonGuo/Ecommerce-Platform
 
 SKILLS:
-- Languages: Python, JavaScript, TypeScript, C#, Go, C++, HTML, CSS
-- Frameworks: React, React Native, Vite, Next.js, Flask, Django, Electron, Gin, Node.js, Tailwind CSS, Angular, ASP.NET
-- Databases: PostgreSQL, MySQL, MongoDB, SQLite, Redis, Supabase
-- Tools & DevOps: Git, GitHub, Docker, Kubernetes, AWS, Azure, Kafka, Firebase, Cursor, Claude, Postman, Prisma, WebRTC
-- Payments: Stripe integration, RevenueCat
-- AI: OpenAI API, GPT fine-tuning, Azure OpenAI, Semantic Kernel, Supabase Edge Functions
-- Design: Adobe Photoshop, Illustrator, InDesign
+- Languages: Python, JavaScript/TypeScript, C#, Go
+- Frameworks: React/React Native, Vite, Next.js, Flask, Django, Electron, Gin
+- Databases: PostgreSQL, MySQL, MongoDB, SQLite, Redis
+- Tools & DevOps: Git, Supabase, Docker, Kubernetes, AWS, Azure
 
 INTERESTS & HOBBIES:
 - Gaming: League of Legends, Dota 2, Monster Hunter, Dying Light, World of Warcraft
