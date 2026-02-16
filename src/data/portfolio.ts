@@ -44,6 +44,7 @@ export const skills: Skill[] = [
   { name: 'ASP .NET', icon: 'dotnet', category: 'framework' },
   { name: 'Gin', icon: 'gin', category: 'framework' },
   { name: 'Electron', icon: 'electron', category: 'framework' },
+  { name: 'Chakra UI', icon: 'chakraui', category: 'framework' },
 
   // Database & Tools
   { name: 'Prisma', icon: 'prisma', category: 'tool' },
@@ -62,6 +63,7 @@ export const skills: Skill[] = [
   { name: 'Claude', icon: 'anthropic', category: 'tool' },
   { name: 'WebRTC', icon: 'webrtc', category: 'tool' },
   { name: 'Azure', icon: 'microsoftazure', category: 'tool' },
+  { name: 'Langfuse', icon: 'langfuse', category: 'tool' },
 
   // Design
   { name: 'Photoshop', icon: 'adobephotoshop', category: 'design' },
@@ -130,6 +132,16 @@ export const experience: Experience[] = [
 
 export const projects: Project[] = [
   // 2026 Projects
+  {
+    title: 'SmIA - Social Media Intelligence Agent',
+    description:
+      'AI-powered platform that aggregates and analyzes content from Reddit, YouTube, and Amazon, delivering structured trend reports with sentiment analysis and interactive visualizations.',
+    image: '/images/smia-agent.png',
+    githubUrl: 'https://github.com/PlonGuo/smia-agent',
+    demoUrl: 'https://smia-agent.vercel.app',
+    technologies: ['React', 'FastAPI', 'PydanticAI', 'Supabase', 'Chakra UI', 'Langfuse'],
+    year: 2026,
+  },
   {
     title: 'GoChatroom',
     description:

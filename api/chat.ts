@@ -288,44 +288,50 @@ WORK EXPERIENCE:
 
 NOTABLE PROJECTS:
 
-1. Travel Agent Booking System (2026) - Electron, Prisma, SQLite, React, TypeScript
+1. SmIA — Social Media Intelligence Agent (2026) - FastAPI, PydanticAI, Langfuse, Vercel Serverless
+   - Built a dual-interface AI intelligence platform (React + Telegram bot) that analyzes content across Reddit, YouTube, and Amazon via natural language queries, delivering sentiment analysis, trend reports, and key insight extraction
+   - Engineered a fault-tolerant multi-source scraping pipeline with automatic fallback and timeout handling; built an AI agent layer that transforms raw noisy web data into structured analytical reports with end-to-end LLM tracing for cost optimization
+   - GitHub: github.com/PlonGuo/smia-agent
+   - Demo: smia-agent.vercel.app
+
+2. Travel Agent Booking System (2026) - Electron, Prisma, SQLite, React, TypeScript
    - Built full-stack desktop application to automate travel agency payment tracking, reducing financial settlement time from 5+ minutes (manual Excel calculations) to instant calculations and multi-company settlement reports
    - Architected custom database migration system with version-controlled SQL schemas, automatic backup/rollback, and Windows file lock handling, eliminating manual data export/import cycles and update-related support requests to zero
    - Implemented secure Electron IPC architecture for renderer-main communication, with Prisma ORM managing hierarchical data models (Category → Customer → Transaction → OrderItem) and Excel file export for data portability
    - GitHub: github.com/PlonGuo/Travel-Agent-Booking-System
 
-2. Go ChatRoom (2026) - Go, Gin, Redis, WebRTC, React
-   - Built concurrent WebSocket hub with Go channels and mutex locks, handling 1000+ connections with buffered channels
-   - Designed dual-session architecture for bidirectional sync, enabling real-time delivery and read status tracking per user
-   - Implemented Redis for session and online status management, reducing database queries by 60%
-   - Developed P2P WebRTC calling with custom signaling server, cutting bandwidth costs by 90% vs centralized streaming
+3. Go ChatRoom (2026) - Go, Gin, Redis, WebRTC, React
+   - Built concurrent WebSocket chat server in Go using goroutine-per-connection model with buffered channels (256-deep) and sync.RWMutex for thread-safe client registry, supporting real-time messaging and group broadcast
+   - Designed per-user session architecture with atomic unread count tracking via GORM expressions, enabling bidirectional conversation sync between frontend Redux state and backend via WebSocket events
+   - Integrated Redis as a session token cache for JWT-based authentication, mapping tokens to user UUIDs with 24-hour TTL expiration, eliminating repeated database lookups on every authenticated API request
+   - Implemented peer-to-peer video/audio calling with a custom Go WebSocket signaling server, handling SDP offer/answer exchange, ICE candidate queuing with flush-on-ready, and automatic ICE restart with exponential retry (up to 3 attempts)
    - Deployed on Vercel (frontend) + Fly.io (backend)
    - GitHub: github.com/PlonGuo/GoChatroom
 
-3. FlowBoard (2026) - Angular 17, C#, .NET 8, Azure, SignalR
-   - Developed real-time team collaboration platform addressing inefficiencies in asynchronous kanban tools, enabling instant multi-user synchronization with integrated AI assistant and collaborative whiteboard for system design discussions
-   - Implemented SignalR WebSocket with CQRS/MediatR and optimistic concurrency control (ROWVERSION) for 50+ concurrent users, utilizing message batching and .NET Channels to prevent race conditions and message storms
-   - Integrated Azure OpenAI via Semantic Kernel for natural language task creation and Excalidraw for real-time collaborative diagramming with operational transformation
+4. FlowBoard (2026) - Angular 17, C#, .NET 8, Azure, SignalR
+   - Built a real-time collaborative kanban board with integrated whiteboard, enabling teams to synchronize task management and system design discussions, replacing fragmented async workflows with live multi-user editing and instant notifications
+   - Architected .NET backend using Clean Architecture with CQRS/MediatR (31 command/query handlers), optimistic concurrency control via RowVersion, and dual SignalR WebSocket hubs for live board updates and collaborative drawing with user presence tracking, color-coded cursors, and group-based message routing
+   - Integrated Excalidraw whiteboard into Angular SPA with real-time scene synchronization, cursor broadcasting (throttled at 100ms), and auto-save with debounce — alongside a full kanban board with drag-and-drop task management across columns
    - GitHub: github.com/PlonGuo/flowboard
 
-4. Sportlingo Coaching Dashboard (2025) - React, Supabase, AI, TypeScript
+5. Sportlingo Coaching Dashboard (2025) - React, Supabase, AI, TypeScript
    - My flagship project at Next Play Games that I led as the main developer
    - B2B platform for coaches with team management, progress monitoring, and real-time analytics
    - Demo: sportlingo.ai
 
-5. GitHub Finder (2024) - React, GitHub API, Tailwind CSS
+6. GitHub Finder (2024) - React, GitHub API, Tailwind CSS
    - Web app for searching GitHub accounts and browsing profile information
    - Demo: github-finder-three-pink.vercel.app
 
-6. Food E-commerce Platform (2023) - Python, Django, Bootstrap, SQLite
+7. Food E-commerce Platform (2023) - Python, Django, Bootstrap, SQLite
    - Online store for browsing and purchasing food products
    - GitHub: github.com/PlonGuo/Ecommerce-Platform
 
 SKILLS:
 - Languages: Python, JavaScript/TypeScript, C#, Go
-- Frameworks: React/React Native, Vite, Next.js, Flask, Django, Electron, Gin
+- Frameworks: React/React Native, Vite, Next.js, FastAPI, Flask, Django, Electron, Gin, PydanticAI, Chakra UI
 - Databases: PostgreSQL, MySQL, MongoDB, SQLite, Redis
-- Tools & DevOps: Git, Supabase, Docker, Kubernetes, AWS, Azure
+- Tools & DevOps: Git, Supabase, Docker, Kubernetes, AWS, Azure, Langfuse
 
 INTERESTS & HOBBIES:
 - Gaming: League of Legends, Dota 2, Monster Hunter, Dying Light, World of Warcraft
