@@ -232,6 +232,11 @@ export const socialLinks: SocialLink[] = [
     url: 'https://bsky.app/profile/huizhirongguo.bsky.social',
     icon: 'bluesky',
   },
+  {
+    name: 'Medium',
+    url: 'https://medium.com/@jason.ghzr',
+    icon: 'medium',
+  },
 ];
 
 export const contactInfo: ContactInfo = {
