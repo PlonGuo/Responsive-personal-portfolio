@@ -1,20 +1,24 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, Github, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ExternalLink, Github, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { projects } from '../data/portfolio';
+
+const DISPLAY_COUNT = 5;
+const displayProjects = projects.slice(0, DISPLAY_COUNT);
 
 export default function Portfolio() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextProject = () => {
-    setCurrentIndex((prev) => (prev + 1) % projects.length);
+    setCurrentIndex((prev) => (prev + 1) % displayProjects.length);
   };
 
   const prevProject = () => {
-    setCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length);
+    setCurrentIndex((prev) => (prev - 1 + displayProjects.length) % displayProjects.length);
   };
 
-  const currentProject = projects[currentIndex];
+  const currentProject = displayProjects[currentIndex];
 
   return (
     <section id="portfolio" className="py-20 lg:py-32 bg-slate-50 dark:bg-slate-800/50">
@@ -148,7 +152,7 @@ export default function Portfolio() {
 
             {/* Pagination Dots */}
             <div className="flex gap-2">
-              {projects.map((_, index) => (
+              {displayProjects.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
@@ -170,6 +174,26 @@ export default function Portfolio() {
               <ChevronRight size={24} />
             </button>
           </div>
+
+          {/* See More CTA */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="flex justify-center mt-6"
+          >
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
+              See more projects, go to{' '}
+              <Link
+                to="/lab"
+                className="inline-flex items-center gap-1 text-primary dark:text-white underline underline-offset-2 decoration-primary dark:decoration-white hover:decoration-transparent transition-all duration-200 font-medium"
+              >
+                Lab
+                <ArrowRight size={14} />
+              </Link>
+            </p>
+          </motion.div>
         </motion.div>
       </div>
     </section>

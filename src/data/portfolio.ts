@@ -133,6 +133,16 @@ export const experience: Experience[] = [
 export const projects: Project[] = [
   // 2026 Projects
   {
+    title: 'AI-Powered Mom Test Validation',
+    description:
+      'Real-time Voice AI interviewer that conducts unbiased startup validation interviews using the Mom Test framework, then analyzes transcripts to extract validated pain points and insight reports.',
+    image: '/images/mom-test-validation.png',
+    githubUrl: 'https://github.com/Daiki007121/Digital-Entrepreneurs-AI-Powered-Mom-Test-Validation',
+    demoUrl: 'https://digital-entrepreneurs.vercel.app',
+    technologies: ['Next.js', 'React', 'TypeScript', 'Supabase', 'Gemini Live API', 'Tailwind CSS'],
+    year: 2026,
+  },
+  {
     title: 'SmIA - Social Media Intelligence Agent',
     description:
       'AI-powered platform that aggregates and analyzes content from Reddit, YouTube, and Amazon, delivering structured trend reports with sentiment analysis and interactive visualizations.',
