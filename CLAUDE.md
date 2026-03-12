@@ -132,6 +132,10 @@ SUPABASE_ACCESS_TOKEN=your-access-token
 3. SEO (meta tags, semantic HTML)
 4. Bundle size (tree-shaking, minimal deps)
 
+## Git Workflow
+
+**Do NOT push to GitHub unless the user explicitly says so.** Commit locally as needed, but never run `git push` without a direct instruction.
+
 ## Sound Notification (macOS)
 
 IMPORTANT: After finishing responding to my request or running a command, run this command to notify me by sound:

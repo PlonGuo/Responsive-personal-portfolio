@@ -141,7 +141,7 @@ export default function Header() {
             {/* Theme Toggle - hide on Lab page */}
             {!isLabPage && (
               <button
-                onClick={toggleTheme}
+                onClick={(e) => toggleTheme(e)}
                 className="ml-2 p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
                 aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               >
@@ -164,7 +164,7 @@ export default function Header() {
             {/* Mobile Theme Toggle - hide on Lab page */}
             {!isLabPage && (
               <button
-                onClick={toggleTheme}
+                onClick={(e) => toggleTheme(e)}
                 className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               >

@@ -83,20 +83,33 @@ export default function About() {
               </motion.div>
             </div>
 
-            {/* Download CV Button */}
-            <motion.a
-              href="/Huizhirong Guo.pdf"
-              download="Huizhirong_Guo_CV"
-              target="_blank"
+            {/* Download CV Buttons */}
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5 }}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-dark text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-primary/25 hover:shadow-xl cursor-pointer"
+              className="flex flex-wrap gap-3"
             >
-              Download CV
-              <Download size={20} />
-            </motion.a>
+              <a
+                href="/Huizhirong Guo.pdf"
+                download="Huizhirong_Guo_CV"
+                target="_blank"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-dark text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-primary/25 hover:shadow-xl cursor-pointer"
+              >
+                Download CV (EN)
+                <Download size={20} />
+              </a>
+              <a
+                href="/过汇智融-中文简历.pdf"
+                download="过汇智融-中文简历"
+                target="_blank"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium rounded-xl transition-all duration-200 shadow-md cursor-pointer"
+              >
+                下载简历 (中文)
+                <Download size={20} />
+              </a>
+            </motion.div>
           </motion.div>
         </div>
       </div>

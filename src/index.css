@@ -160,6 +160,38 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ========================================
+   Theme Toggle - View Transition Ripple
+   ======================================== */
+
+/* Old snapshot stays frozen underneath */
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* New snapshot expands as a circle from the click point */
+::view-transition-new(root) {
+  mix-blend-mode: normal;
+  animation: theme-ripple 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes theme-ripple {
+  from {
+    clip-path: circle(0 at var(--ripple-x, 50%) var(--ripple-y, 50%));
+  }
+  to {
+    clip-path: circle(150vmax at var(--ripple-x, 50%) var(--ripple-y, 50%));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ========================================
    Lab Page - Sci-Fi Theme Styles
    ======================================== */
 

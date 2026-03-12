@@ -136,7 +136,7 @@ export const projects: Project[] = [
     title: 'AI-Powered Mom Test Validation',
     description:
       'Real-time Voice AI interviewer that conducts unbiased startup validation interviews using the Mom Test framework, then analyzes transcripts to extract validated pain points and insight reports.',
-    image: '/images/mom-test-validation.png',
+    image: '/images/mom-test-interviewer.png',
     githubUrl: 'https://github.com/Daiki007121/Digital-Entrepreneurs-AI-Powered-Mom-Test-Validation',
     demoUrl: 'https://digital-entrepreneurs.vercel.app',
     technologies: ['Next.js', 'React', 'TypeScript', 'Supabase', 'Gemini Live API', 'Tailwind CSS'],
@@ -158,7 +158,6 @@ export const projects: Project[] = [
       'Real-time chat application with React frontend and Go backend, deployed on Vercel + Fly.io',
     image: '/images/go-chatroom.png',
     githubUrl: 'https://github.com/PlonGuo/GoChatroom',
-    demoUrl: 'https://frontend-three-pied-39.vercel.app',
     technologies: ['React', 'Go', 'WebSocket', 'Vercel', 'Fly.io'],
     year: 2026,
   },
