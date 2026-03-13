@@ -1,3 +1,5 @@
+import claudeDevSetupRalphLoop from './posts/claude-dev-setup-ralph-loop';
+import smiaMcpServer from './posts/smia-mcp-server';
 import smiaAgentFromIdeaToLaunch from './posts/smia-agent-from-idea-to-launch';
 import nextStepLocalNewsAgent from './posts/next-step-local-news-agent';
 import vibeCodingNewsApp5Hours from './posts/vibe-coding-news-app-5-hours';
@@ -7,6 +9,8 @@ import stripeIntegrationLessons from './posts/stripe-integration-lessons';
 import whyIChoseCs from './posts/why-i-chose-cs';
 
 export const blogPosts = [
+  claudeDevSetupRalphLoop,
+  smiaMcpServer,
   smiaAgentFromIdeaToLaunch,
   nextStepLocalNewsAgent,
   vibeCodingNewsApp5Hours,
