@@ -58,13 +58,19 @@ export default function Qualifications() {
                     <h4 className="font-heading font-semibold text-slate-900 dark:text-white mb-1">
                       {item.degree}
                     </h4>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                      {item.school}
-                    </p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">{item.school}</p>
+                    {item.college && (
+                      <p className="text-xs text-slate-500 dark:text-slate-500 mb-1">{item.college}</p>
+                    )}
                     <p className="text-xs text-slate-500 dark:text-slate-500">
                       {item.period}
                       {item.location && ` • ${item.location}`}
                     </p>
+                    {item.note && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 border-t border-slate-200 dark:border-slate-700 pt-2">
+                        {item.note}
+                      </p>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -119,16 +125,31 @@ export default function Qualifications() {
                     <h4 className="font-heading font-semibold text-slate-900 dark:text-white mb-1">
                       {item.title}
                     </h4>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
                       {item.company}
+                      {item.companyNote && (
+                        <span className="text-slate-500 dark:text-slate-500"> · {item.companyNote}</span>
+                      )}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-500 mb-2">
                       {item.period}
+                      {item.location && ` • ${item.location}`}
                     </p>
-                    {item.description && (
-                      <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 border-t border-slate-200 dark:border-slate-700 pt-2">
-                        {item.description}
-                      </p>
+                    {item.summary && (
+                      <p className="text-sm font-medium text-secondary mb-2">{item.summary}</p>
+                    )}
+                    {item.highlights && item.highlights.length > 0 && (
+                      <ul className="mt-2 border-t border-slate-200 dark:border-slate-700 pt-2 space-y-2">
+                        {item.highlights.map((point, i) => (
+                          <li
+                            key={i}
+                            className="text-sm text-slate-500 dark:text-slate-400 flex gap-2"
+                          >
+                            <span className="text-secondary shrink-0 mt-0.5">▸</span>
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </div>
                 </motion.div>
