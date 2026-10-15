@@ -38,6 +38,7 @@ export interface Project {
   technologies: string[];
   year: number;
   featured?: boolean;
+  showActiveBadge: boolean;
 }
 
 export interface SocialLink {

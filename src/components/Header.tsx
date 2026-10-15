@@ -1,32 +1,53 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+'use client';
+
+import Image from 'next/image';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import type { Locale } from '../../lib/i18n/locales';
+import type { Dictionary } from '../../lib/i18n/types';
 import { Menu, X, Home, User, Code2, Briefcase, FolderOpen, Mail, FileText, Beaker, Sun, Moon } from 'lucide-react';
-import avatarImage from '../assets/jason-clipart.jpg';
+const avatarImage = '/images/jason-clipart.jpg';
 import { useTheme } from '../hooks/useTheme';
+import LanguageSwitcher from './LanguageSwitcher';
+import { getLanguageNavigation } from '../../lib/client/language-navigation';
 
 // Hash links for homepage sections
 const homeSectionItems = [
-  { name: 'Home', href: '#home', icon: Home },
-  { name: 'About', href: '#about', icon: User },
-  { name: 'Skills', href: '#skills', icon: Code2 },
-  { name: 'Qualifications', href: '#qualifications', icon: Briefcase },
-  { name: 'Portfolio', href: '#portfolio', icon: FolderOpen },
-  { name: 'Contact', href: '#contact', icon: Mail },
-];
+  { name: 'home', href: '#home', icon: Home },
+  { name: 'about', href: '#about', icon: User },
+  { name: 'skills', href: '#skills', icon: Code2 },
+  { name: 'qualifications', href: '#qualifications', icon: Briefcase },
+  { name: 'portfolio', href: '#portfolio', icon: FolderOpen },
+  { name: 'contact', href: '#contact', icon: Mail },
+] as const;
 
 // Route links for separate pages
 const pageLinks = [
-  { name: 'Blog', href: '/blog', icon: FileText },
-  { name: 'Lab', href: '/lab', icon: Beaker },
-];
+  { name: 'blog', href: '/blog', icon: FileText },
+  { name: 'lab', href: '/lab', icon: Beaker },
+] as const;
 
-export default function Header() {
+export default function Header({ locale, name, copy }: {
+  locale: Locale; name: string; copy: Pick<Dictionary, 'nav' | 'a11y'>;
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
-  const isLabPage = location.pathname === '/lab';
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
+  const closeMenu = useCallback(() => {
+    // Move focus before aria-hidden/inert hides the menu from accessibility.
+    if (menuRef.current?.contains(document.activeElement)) {
+      menuToggleRef.current?.focus({ preventScroll: true });
+    }
+    setIsMenuOpen(false);
+  }, []);
+  const pathname = usePathname();
+  const router = useRouter();
+  const isHomePage = pathname === `/${locale}`;
+  const isLabPage = pathname === `/${locale}/lab`;
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -51,51 +72,57 @@ export default function Header() {
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isHomePage]);
+    const unsubscribe = getLanguageNavigation().subscribe(() => {
+      if (getLanguageNavigation().getSnapshot().pending) closeMenu();
+    });
+    return () => { window.removeEventListener('scroll', handleScroll); unsubscribe(); };
+  }, [isHomePage, closeMenu]);
 
   const handleNavClick = (href: string) => {
-    setIsMenuOpen(false);
+    closeMenu();
     // If we're not on homepage and clicking a hash link, navigate to home first
     if (!isHomePage && href.startsWith('#')) {
-      window.location.href = '/' + href;
+      router.push(`/${locale}${href}`);
       return;
     }
     const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
   };
 
   return (
     <header
-      className={`fixed top-4 left-4 right-4 z-50 transition-all duration-300 rounded-2xl ${
-        isScrolled
-          ? 'glass bg-white/80 dark:bg-slate-900/80 shadow-lg'
-          : 'bg-transparent'
-      }`}
+      className="site-header fixed top-0 inset-x-0 z-50"
+      data-tone={isLabPage ? 'dark' : undefined}
+      data-scrolled={isScrolled || isMenuOpen}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="header-backdrop" aria-hidden="true">
+        <span className="header-blur header-blur-soft" />
+        <span className="header-blur header-blur-medium" />
+        <span className="header-blur header-blur-strong" />
+      </div>
+      <nav className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a
-            href="#home"
+            href={`/${locale}#home`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('#home');
             }}
-            className="font-heading font-bold text-xl text-slate-900 dark:text-white hover:text-primary transition-colors cursor-pointer"
+            className={`font-heading font-bold text-xl ${isLabPage ? "text-white" : "text-slate-900 dark:text-white"} hover:text-primary transition-colors cursor-pointer`}
           >
-            Huizhirong Guo
+            {name}
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1">
             {/* Homepage section links - only show on homepage */}
             {isHomePage && homeSectionItems.map((item) => (
               <a
                 key={item.name}
-                href={item.href}
+                href={`/${locale}${item.href}`}
                 onClick={(e) => {
                   e.preventDefault();
                   handleNavClick(item.href);
@@ -103,20 +130,20 @@ export default function Header() {
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
                   activeSection === item.href.slice(1)
                     ? 'text-primary bg-primary/10'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800'
+                    : `${isLabPage ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'} hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800`
                 }`}
               >
-                {item.name}
+                {copy.nav[item.name]}
               </a>
             ))}
 
             {/* Back to Home link - show on non-home pages */}
             {!isHomePage && (
               <Link
-                to="/"
-                className="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800"
+                href={`/${locale}`}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${isLabPage ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'} hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800`}
               >
-                Home
+                {copy.nav.home}
               </Link>
             )}
 
@@ -127,14 +154,14 @@ export default function Header() {
             {pageLinks.map((item) => (
               <Link
                 key={item.name}
-                to={item.href}
+                href={`/${locale}${item.href}`}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
-                  location.pathname === item.href
+                  pathname === `/${locale}${item.href}`
                     ? 'text-primary bg-primary/10'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800'
+                    : `${isLabPage ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'} hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800`
                 }`}
               >
-                {item.name}
+                {copy.nav[item.name]}
               </Link>
             ))}
 
@@ -142,8 +169,8 @@ export default function Header() {
             {!isLabPage && (
               <button
                 onClick={(e) => toggleTheme(e)}
-                className="ml-2 p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
-                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                className={`ml-2 p-2 rounded-xl ${isLabPage ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'} hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200`}
+                aria-label={theme === 'dark' ? copy.a11y.lightTheme : copy.a11y.darkTheme}
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
@@ -151,9 +178,12 @@ export default function Header() {
 
             {/* Avatar */}
             <div className="ml-1">
-              <img
+              <Image
                 src={avatarImage}
-                alt="Jason Guo"
+                alt={name}
+                width={36}
+                height={36}
+                loading="eager"
                 className="w-9 h-9 rounded-full object-cover border-2 border-primary/30 hover:border-primary transition-colors"
               />
             </div>
@@ -165,22 +195,29 @@ export default function Header() {
             {!isLabPage && (
               <button
                 onClick={(e) => toggleTheme(e)}
-                className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                className={`lg:hidden p-2 rounded-xl ${isLabPage ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'} hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors`}
+                aria-label={theme === 'dark' ? copy.a11y.lightTheme : copy.a11y.darkTheme}
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             )}
             {/* Mobile Avatar */}
-            <img
+            <Image
               src={avatarImage}
-              alt="Jason Guo"
-              className="md:hidden w-8 h-8 rounded-full object-cover border-2 border-primary/30"
+              alt={name}
+              width={32}
+              height={32}
+              loading="eager"
+              className="lg:hidden w-8 h-8 rounded-full object-cover border-2 border-primary/30"
             />
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              aria-label="Toggle menu"
+              id="mobile-menu-toggle"
+              ref={menuToggleRef}
+              onClick={() => isMenuOpen ? closeMenu() : setIsMenuOpen(true)}
+              className={`lg:hidden p-2 rounded-xl ${isLabPage ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'} hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer`}
+              aria-label={isMenuOpen ? copy.a11y.closeMenu : copy.a11y.menu}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -189,11 +226,16 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${
+          id="mobile-navigation"
+          ref={menuRef}
+          inert={!isMenuOpen}
+          aria-hidden={!isMenuOpen}
+          className={`lg:hidden overflow-hidden transition-all duration-300 ease-out ${
             isMenuOpen ? 'max-h-[500px] pb-4' : 'max-h-0'
           }`}
         >
           <div className="grid grid-cols-2 gap-2 pt-2">
+            <LanguageSwitcher locale={locale} variant="menu" onSelect={closeMenu} />
             {/* Homepage section links */}
             {isHomePage ? (
               homeSectionItems.map((item) => {
@@ -201,7 +243,7 @@ export default function Header() {
                 return (
                   <a
                     key={item.name}
-                    href={item.href}
+                    href={`/${locale}${item.href}`}
                     onClick={(e) => {
                       e.preventDefault();
                       handleNavClick(item.href);
@@ -209,22 +251,22 @@ export default function Header() {
                     className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
                       activeSection === item.href.slice(1)
                         ? 'text-primary bg-primary/10'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        : `${isLabPage ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'} hover:bg-slate-100 dark:hover:bg-slate-800`
                     }`}
                   >
                     <Icon size={18} />
-                    {item.name}
+                    {copy.nav[item.name]}
                   </a>
                 );
               })
             ) : (
               <Link
-                to="/"
-                onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                href={`/${locale}`}
+                onClick={closeMenu}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${isLabPage ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'} hover:bg-slate-100 dark:hover:bg-slate-800`}
               >
                 <Home size={18} />
-                Home
+                {copy.nav.home}
               </Link>
             )}
 
@@ -237,16 +279,16 @@ export default function Header() {
               return (
                 <Link
                   key={item.name}
-                  to={item.href}
-                  onClick={() => setIsMenuOpen(false)}
+                  href={`/${locale}${item.href}`}
+                  onClick={closeMenu}
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
-                    location.pathname === item.href
+                    pathname === `/${locale}${item.href}`
                       ? 'text-primary bg-primary/10'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : `${isLabPage ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'} hover:bg-slate-100 dark:hover:bg-slate-800`
                   }`}
                 >
                   <Icon size={18} />
-                  {item.name}
+                  {copy.nav[item.name]}
                 </Link>
               );
             })}

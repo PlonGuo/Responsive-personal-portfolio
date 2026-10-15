@@ -1,0 +1,137 @@
+{
+  "provenance": "Captured from the legacy runtime TypeScript articles before PB-10 retirement. Do not regenerate from current MDX; changes require deliberate editorial review.",
+  "posts": [
+    {
+      "slug": "claude-dev-setup-ralph-loop",
+      "title": "How I Set Up Claude Code for Autonomous Development with the Ralph Loop",
+      "excerpt": "I spent a day building a reusable Claude Code configuration — a long-running autonomous loop, eval-driven task completion, and quality assurance commands. Here's what I learned from Anthropic's engineering playbook.",
+      "date": "2026-03-12",
+      "tags": [
+        "AI",
+        "Claude Code",
+        "Automation",
+        "DevOps",
+        "Open Source"
+      ],
+      "readTime": 8,
+      "contentSha256": "f66357892bb1495d442122a2e280a8c085324533f573046b65dac984842d7103"
+    },
+    {
+      "slug": "smia-mcp-server",
+      "title": "Adding MCP to SmIA: Making AI Digest Available to Any AI Client",
+      "excerpt": "How I added a public MCP server to SmIA so Claude Desktop, Cursor, and Windsurf can fetch AI digests directly — and why MCP is really just an API with an AI-friendly interface.",
+      "date": "2026-03-12",
+      "tags": [
+        "AI",
+        "MCP",
+        "FastAPI",
+        "Python",
+        "SmIA"
+      ],
+      "readTime": 7,
+      "contentSha256": "81130cd740f6bd690620e2aeb9ad2d1ac1dd048edaf6e3c9cb4d1f1dff864be3"
+    },
+    {
+      "slug": "smia-agent-from-idea-to-launch",
+      "title": "SmIA Agent: From Blog Post to Live Product in 2 Days",
+      "excerpt": "The follow-up to my \"next step\" post — how I shipped a dual-interface AI intelligence platform with PydanticAI, FastAPI, and React, and what I'm planning next.",
+      "date": "2026-02-15",
+      "tags": [
+        "AI",
+        "PydanticAI",
+        "FastAPI",
+        "React",
+        "Supabase",
+        "Langfuse"
+      ],
+      "readTime": 9,
+      "contentSha256": "a112786ab7c846014201499897554823f3adcea5d7a7b6a4d4aec60a34814dd2"
+    },
+    {
+      "slug": "next-step-local-news-agent",
+      "title": "My Next Step: Building a Local AI Agent That Fetches and Summarizes Daily News",
+      "excerpt": "Exploring PydanticAI, Crawl4AI, and FastAPI to build a personal news agent for my friends — and why this stack excites me.",
+      "date": "2026-02-11",
+      "tags": [
+        "AI",
+        "PydanticAI",
+        "FastAPI",
+        "Crawl4AI",
+        "Python"
+      ],
+      "readTime": 7,
+      "contentSha256": "155899b0efaef8d9fdcf9293b4102b2666a390cede2687133524f1a81100deca"
+    },
+    {
+      "slug": "vibe-coding-news-app-5-hours",
+      "title": "Vibe Coding: I Built a Mobile News App in 5 Hours with Just a PRD",
+      "excerpt": "How I used vibe coding with AI to go from a product requirements document to a fully functional news-fetching mobile app in a single sitting.",
+      "date": "2026-02-10",
+      "tags": [
+        "Vibe Coding",
+        "AI",
+        "Mobile",
+        "React Native",
+        "Productivity"
+      ],
+      "readTime": 8,
+      "contentSha256": "284fcaf8e88eb1ccf534e01dca6ed1d6c2c060039f96af28a25d6583881c01ee"
+    },
+    {
+      "slug": "desktop-app-for-mom",
+      "title": "My First Real-World App: Building a Desktop Solution for My Mom's Business",
+      "excerpt": "How I built an Electron desktop app to help my mom manage her travel agency business, and what I learned about building for real users.",
+      "date": "2026-01-30",
+      "tags": [
+        "Electron",
+        "Desktop",
+        "SQLite",
+        "UX",
+        "Real-World"
+      ],
+      "readTime": 7,
+      "contentSha256": "0d4c3b53b123583b24558c0360a72d14c62c5a600378f049c0abf742c9377594"
+    },
+    {
+      "slug": "building-sportlingo",
+      "title": "Building Sportlingo: A B2B Coaching Platform",
+      "excerpt": "My journey leading the development of a comprehensive coaching dashboard with React, Supabase, and AI features.",
+      "date": "2026-01-05",
+      "tags": [
+        "React",
+        "Supabase",
+        "AI",
+        "TypeScript"
+      ],
+      "readTime": 8,
+      "contentSha256": "dfabaa12689eed03042012eb4f00e94b1961acb7f7bee4b5c92e86c1c6946a28"
+    },
+    {
+      "slug": "stripe-integration-lessons",
+      "title": "Lessons from Stripe Integration",
+      "excerpt": "What I learned implementing payment subscriptions, webhooks, and PCI compliance in a real-world application.",
+      "date": "2025-12-20",
+      "tags": [
+        "Stripe",
+        "Payments",
+        "Backend",
+        "Security"
+      ],
+      "readTime": 6,
+      "contentSha256": "f740c49c297144101832200766e94fe46eb59a6525366e0b6351cddfefe8566d"
+    },
+    {
+      "slug": "why-i-chose-cs",
+      "title": "Why I Chose Computer Science",
+      "excerpt": "The ability to create something from nothing with just a computer - that power of creation is what drew me to CS.",
+      "date": "2025-12-10",
+      "tags": [
+        "Personal",
+        "Career",
+        "Reflection"
+      ],
+      "readTime": 4,
+      "contentSha256": "097b35554a65b76e991a56a24dc5a041730222a55797a4e023aff75026bb3a39"
+    }
+  ]
+}

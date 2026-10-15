@@ -1,6 +1,12 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { BellDot, X, ExternalLink, RefreshCw, GitCommit } from 'lucide-react';
+
+import type { Locale } from '../../lib/i18n/locales';
+import type { Dictionary } from '../../lib/i18n/types';
+import { getErrorMessage, getUIErrorCode, type UIErrorCode } from '../../lib/i18n/errors';
 
 interface Commit {
   sha: string;
@@ -10,40 +16,46 @@ interface Commit {
   url: string;
 }
 
-export default function UpdatesWidget() {
+export default function UpdatesWidget({ locale, copy }: { locale: Locale; copy: Pick<Dictionary, 'updates' | 'a11y' | 'errors'> }) {
+  const reduced = useReducedMotion();
   const [isOpen, setIsOpen] = useState(false);
   const [commits, setCommits] = useState<Commit[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<UIErrorCode | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const fetching = useRef(false);
 
   const fetchCommits = async () => {
+    if (fetching.current) return;
+    fetching.current = true;
     setLoading(true);
     setError(null);
     try {
       const response = await fetch('/api/github-commits');
-      if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
+      if (!response.ok) { setError(getUIErrorCode(response.status, data.code)); return; }
       setCommits(data.commits || []);
     } catch (err) {
-      setError('Unable to load updates');
+      setError('generic');
       console.error('Error fetching commits:', err);
     } finally {
+      fetching.current = false;
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (isOpen && commits.length === 0) {
-      fetchCommits();
-    }
-  }, [isOpen]);
+  const close = () => { setIsOpen(false); launcherRef.current?.focus(); };
+  const open = () => {
+    setIsOpen(true);
+    if (!commits.length) void fetchCommits();
+  };
 
   // Click outside to close
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        close();
       }
     };
 
@@ -56,7 +68,7 @@ export default function UpdatesWidget() {
   // Escape key to close
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsOpen(false);
+      if (event.key === 'Escape') { setIsOpen(false); launcherRef.current?.focus(); }
     };
     if (isOpen) {
       window.addEventListener('keydown', handleEscape);
@@ -71,17 +83,20 @@ export default function UpdatesWidget() {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (diffHours < 1) return copy.updates.justNow;
+    if (diffHours < 24) return copy.updates.hoursAgo.replace('{count}', String(diffHours));
+    if (diffDays < 7) return copy.updates.daysAgo.replace('{count}', String(diffDays));
+    return date.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
   };
 
   return (
     <>
       {/* Toggle Button - Middle Right */}
       <motion.button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={launcherRef}
+        tabIndex={isOpen ? -1 : 0}
+        aria-hidden={isOpen}
+        onClick={open}
         className={`fixed top-1/2 -translate-y-1/2 right-6 z-50 w-12 h-12 rounded-full
           bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600
           text-slate-300 hover:text-white
@@ -90,9 +105,9 @@ export default function UpdatesWidget() {
           transition-all duration-200
           border border-slate-700 dark:border-slate-600
           ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="View recent updates"
+        whileHover={reduced ? undefined : { scale: 1.05 }}
+        whileTap={reduced ? undefined : { scale: 0.95 }}
+        aria-label={copy.a11y.updates}
       >
         <BellDot className="w-5 h-5" />
       </motion.button>
@@ -102,11 +117,12 @@ export default function UpdatesWidget() {
         {isOpen && (
           <motion.div
             ref={panelRef}
-            initial={{ opacity: 0, x: 20, scale: 0.95 }}
+            initial={reduced ? false : { opacity: 0, x: 20, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="fixed top-1/2 -translate-y-1/2 right-6 z-50 w-80 max-h-[70vh]
+            exit={reduced ? undefined : { opacity: 0, x: 20, scale: 0.95 }}
+            transition={{ duration: reduced ? 0 : 0.2 }}
+            role="dialog" aria-label={copy.updates.title}
+            className="fixed top-1/2 -translate-y-1/2 right-6 z-50 w-80 max-w-[calc(100vw-3rem)] max-h-[70vh]
               bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl
               rounded-2xl border border-slate-200 dark:border-slate-700
               shadow-2xl shadow-slate-900/10 dark:shadow-slate-900/50
@@ -117,7 +133,7 @@ export default function UpdatesWidget() {
               <div className="flex items-center gap-2">
                 <GitCommit className="w-5 h-5 text-primary" />
                 <h3 className="font-heading font-semibold text-slate-900 dark:text-white text-sm">
-                  Recent Updates
+                  {copy.updates.title}
                 </h3>
               </div>
               <div className="flex items-center gap-1">
@@ -125,16 +141,16 @@ export default function UpdatesWidget() {
                   onClick={fetchCommits}
                   disabled={loading}
                   className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                  aria-label="Refresh"
+                  aria-label={copy.a11y.refresh}
                 >
                   <RefreshCw
                     className={`w-4 h-4 text-slate-500 ${loading ? 'animate-spin' : ''}`}
                   />
                 </button>
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={close}
                   className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                  aria-label="Close"
+                  aria-label={copy.a11y.close}
                 >
                   <X className="w-4 h-4 text-slate-500" />
                 </button>
@@ -144,14 +160,14 @@ export default function UpdatesWidget() {
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-3">
               {error ? (
-                <p className="text-sm text-slate-500 text-center py-4">{error}</p>
+                <p className="text-sm text-slate-500 text-center py-4" role="alert">{getErrorMessage(error, copy)}</p>
               ) : loading && commits.length === 0 ? (
-                <div className="flex items-center justify-center py-8">
+                <div role="status" aria-label={copy.updates.loading} className="flex items-center justify-center py-8">
                   <RefreshCw className="w-5 h-5 text-primary animate-spin" />
                 </div>
               ) : commits.length === 0 ? (
                 <p className="text-sm text-slate-500 text-center py-4">
-                  No commits found
+                  {copy.updates.empty}
                 </p>
               ) : (
                 <ul className="space-y-2">
@@ -192,7 +208,7 @@ export default function UpdatesWidget() {
                 rel="noopener noreferrer"
                 className="text-xs text-primary hover:text-primary-dark transition-colors flex items-center gap-1"
               >
-                View all commits
+                {copy.updates.all}
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>

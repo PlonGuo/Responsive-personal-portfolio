@@ -1,13 +1,19 @@
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, FileText, Clock } from 'lucide-react';
-import { getLatestPosts } from '../../data/blog-posts';
+'use client';
 
-export default function BlogPreview() {
-  const latestPosts = getLatestPosts(3);
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { ArrowRight, Calendar, FileText, Clock } from 'lucide-react';
+import type { BlogPostMeta } from '../../types/blog';
+import type { Locale } from '../../../lib/i18n/locales';
+import type { Dictionary } from '../../../lib/i18n/types';
+
+export default function BlogPreview({ posts: latestPosts, locale, copy }: {
+  posts: BlogPostMeta[]; locale: Locale; copy: Pick<Dictionary, 'blog' | 'actions'>;
+}) {
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
+      timeZone: 'UTC',
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -19,20 +25,20 @@ export default function BlogPreview() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mb-12"
         >
           <span className="inline-flex items-center gap-2 text-primary text-sm font-medium mb-4">
             <FileText className="w-4 h-4" />
-            From My Blog
+            {copy.blog.eyebrow}
           </span>
           <h2 className="text-3xl sm:text-4xl font-heading font-bold text-slate-900 dark:text-white mb-4">
-            Latest Posts
+            {copy.blog.latest}
           </h2>
           <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Thoughts, tutorials, and insights from my development journey
+            {copy.blog.subtitle}
           </p>
         </motion.div>
 
@@ -41,14 +47,14 @@ export default function BlogPreview() {
           {latestPosts.map((post, index) => (
             <motion.article
               key={post.slug}
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               className="group"
             >
               <Link
-                to={`/blog/${post.slug}`}
+                href={`/en/blog/${post.slug}`}
                 className="block h-full bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
               >
                 {/* Meta info */}
@@ -60,11 +66,12 @@ export default function BlogPreview() {
                   {post.readTime && (
                     <div className="flex items-center gap-1.5">
                       <Clock className="w-4 h-4" />
-                      {post.readTime}m
+                      {copy.blog.readTime.replace("{count}", String(post.readTime))}
                     </div>
                   )}
                 </div>
 
+                {locale === 'zh' && <span className="mb-2 inline-block text-xs text-primary">{copy.blog.englishArticle}</span>}
                 {/* Title */}
                 <h3 className="text-lg font-heading font-semibold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors line-clamp-2">
                   {post.title}
@@ -93,16 +100,16 @@ export default function BlogPreview() {
 
         {/* View All Button */}
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={false}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           className="text-center"
         >
           <Link
-            to="/blog"
+            href={`/${locale}/blog`}
             className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-medium hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors"
           >
-            View All Posts
+            {copy.actions.viewAllPosts}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>

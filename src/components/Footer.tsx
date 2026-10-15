@@ -1,7 +1,12 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import { ArrowUp, Linkedin, Github, Instagram } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
-import { personalInfo, socialLinks } from '../data/portfolio';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import type { SocialLink } from '../types';
+import type { Locale } from '../../lib/i18n/locales';
+import type { Dictionary } from '../../lib/i18n/types';
 
 // Bluesky icon
 const BlueskyIcon = () => (
@@ -10,40 +15,54 @@ const BlueskyIcon = () => (
   </svg>
 );
 
+const MediumIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className="w-5 h-5"
+  >
+    <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z" />
+  </svg>
+);
+
 const socialIcons: Record<string, React.ReactNode> = {
   linkedin: <Linkedin size={20} />,
   github: <Github size={20} />,
   instagram: <Instagram size={20} />,
   bluesky: <BlueskyIcon />,
+  medium: <MediumIcon />,
 };
 
 // Links for homepage (hash navigation to sections)
 const homePageLinks = [
-  { name: 'About Me', href: '#about' },
-  { name: 'My Portfolio', href: '#portfolio' },
-  { name: 'Contact Me', href: '#contact' },
-];
+  { name: 'about', href: '#about' },
+  { name: 'portfolio', href: '#portfolio' },
+  { name: 'contact', href: '#contact' },
+] as const;
 
 // Links for other pages (route navigation)
 const otherPageLinks = [
-  { name: 'Home', href: '/' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Lab', href: '/lab' },
-];
+  { name: 'home', href: '/' },
+  { name: 'blog', href: '/blog' },
+  { name: 'lab', href: '/lab' },
+] as const;
 
-export default function Footer() {
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
+export default function Footer({ locale, name, title, socialLinks, year, copy }: {
+  locale: Locale; name: string; title: string; socialLinks: SocialLink[]; year: number;
+  copy: Pick<Dictionary, 'nav' | 'sections' | 'a11y'>;
+}) {
+  const pathname = usePathname();
+  const isHomePage = pathname === `/${locale}`;
   const footerLinks = isHomePage ? homePageLinks : otherPageLinks;
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   };
 
   const handleNavClick = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
   };
 
@@ -52,11 +71,11 @@ export default function Footer() {
       {/* Scroll to Top Button */}
       <motion.button
         onClick={scrollToTop}
-        initial={{ opacity: 0, y: 20 }}
+        initial={false}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         className="absolute -top-6 left-1/2 -translate-x-1/2 p-4 rounded-full bg-primary dark:bg-slate-800 text-white shadow-lg hover:bg-primary-dark dark:hover:bg-slate-700 transition-colors cursor-pointer"
-        aria-label="Scroll to top"
+        aria-label={copy.a11y.scrollTop}
       >
         <ArrowUp size={24} />
       </motion.button>
@@ -65,19 +84,19 @@ export default function Footer() {
         <div className="grid md:grid-cols-3 gap-8 items-center text-center md:text-left">
           {/* Brand */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
             <h3 className="text-2xl font-heading font-bold text-white mb-2">
-              {personalInfo.shortName.split(' ')[0]}
+              {name}
             </h3>
-            <p className="text-white/70">{personalInfo.title}</p>
+            <p className="text-white/70">{title}</p>
           </motion.div>
 
           {/* Links */}
           <motion.ul
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
@@ -94,14 +113,14 @@ export default function Footer() {
                     }}
                     className="text-white/70 hover:text-white transition-colors cursor-pointer"
                   >
-                    {link.name}
+                    {copy.nav[link.name]}
                   </a>
                 ) : (
                   <Link
-                    to={link.href}
+                    href={link.href === "/" ? `/${locale}` : `/${locale}${link.href}`}
                     className="text-white/70 hover:text-white transition-colors cursor-pointer"
                   >
-                    {link.name}
+                    {copy.nav[link.name]}
                   </Link>
                 )}
               </li>
@@ -110,7 +129,7 @@ export default function Footer() {
 
           {/* Social Links */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
@@ -133,13 +152,13 @@ export default function Footer() {
 
         {/* Copyright */}
         <motion.p
-          initial={{ opacity: 0 }}
+          initial={false}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3 }}
           className="text-center text-white/50 text-sm mt-12 pt-8 border-t border-white/10"
         >
-          © {new Date().getFullYear()} Jason Guo. All rights reserved.
+          © {year} {name}. {copy.sections.footerRights}
         </motion.p>
       </div>
     </footer>

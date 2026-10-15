@@ -1,14 +1,16 @@
 # 个人作品集站：内容更新 + 安全加固 + Next.js 迁移 + AI SDK 重构
 
+> **2026-10-13 状态：** [Active 与双语规格](../specs/2026-10-13-portfolio-bilingual-and-active-badge-design.md)已获用户批准，[实施计划及 PB-01–10 票据](2026-10-13-portfolio-bilingual-and-active-badge.md)已编写，等待审阅与执行安排。本轮仅文档，不执行编码、commit 或部署。下方冲突的单语言代码示例保留为历史参考；对应任务已由新计划中的票据替代，勿重复执行。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 把网站上过期的内容换成当前简历的内容，堵上已发现的几个安全口子，然后把站点从 Vite SPA 迁到 Next.js App Router，最后用 Vercel AI SDK + DeepSeek 重写聊天助手。
+**Goal:** 把网站上过期的内容换成当前简历的内容，加入项目级 Active 显示开关，堵上已发现的几个安全口子，然后把站点从 Vite SPA 迁到支持中英文内容与 SEO 的 Next.js App Router，最后用 Vercel AI SDK + DeepSeek 重写聊天助手。
 
 **Architecture:** 内容与运行时数据分离——作者手写的内容（经历/项目/博客）留在 git 里的 TypeScript 文件；访客产生的运行时数据（限流计数、提交缓存）放 Supabase Postgres。所有数据库访问都在服务端、用 `service_role`，前端永不直连数据库，也不用 anon key。渲染用 Next.js 默认的静态生成（SSG），不做 SSR。
 
 **Tech Stack:** React 19、TypeScript、Tailwind CSS 4、Framer Motion、Next.js（App Router）、Supabase（仅当 Postgres 用）、Vercel AI SDK v7、DeepSeek、Resend、pnpm、Node 22。
 
-**Spec:** 本文件即是 spec（本次没有单独的 spec 文档，全部决策记录在下方"交接上下文"一节）。
+**Spec:** 原范围的决策记录在本文件“交接上下文”。2026-10-13 新增范围以[已批准独立规格](../specs/2026-10-13-portfolio-bilingual-and-active-badge-design.md)为准；其中的语言、字体、路由与徽章决策替代冲突历史示例。对应 tickets 与执行依赖见[实施计划](2026-10-13-portfolio-bilingual-and-active-badge.md)。
 
 ---
 
@@ -17,7 +19,7 @@
 - **包管理器必须是 pnpm**（当前 10.28.2）。不要用 npm 或 yarn。
 - **Node 22**（当前 v22.22.0）。
 - **Tailwind CSS 4**，通过 `@tailwindcss/postcss` 插件接入 Next.js。不要退回 Tailwind 3 的 `tailwind.config.js` 写法。
-- **设计令牌不可改**：主色 `#3B82F6`、辅色 `#8B5CF6`、强调色 `#06B6D4`；卡片圆角 `rounded-2xl`；玻璃拟态用 `backdrop-blur-xl`；标题字体 Space Grotesk，正文字体 DM Sans。
+- **设计令牌**：主色 `#3B82F6`、辅色 `#8B5CF6`、强调色 `#06B6D4`；卡片圆角 `rounded-2xl`；玻璃拟态用 `backdrop-blur-xl`，以上保持。Phase 3 标题与正文统一改为 Noto Sans SC，字体本站托管；旧 Space Grotesk / DM Sans 示例由 PB-08 替代。
 - **类型严格，禁止 `any`**。
 - **深色模式是 class 驱动**（`darkMode: 'class'`），不是 `prefers-color-scheme`。`<html>` 上挂 `light` 或 `dark`。
 - **前端永不导入 `@supabase/supabase-js`**，永不在客户端使用任何 Supabase key。所有数据库调用在服务端，用 `SUPABASE_SERVICE_ROLE_KEY`。
@@ -25,7 +27,9 @@
 - **Supabase 项目 ref**：`leotovftixgkszdwylzu`（项目名 "personal website"）。
 - **Vercel 项目**：`jason-portfolio`（`prj_jWPSDyA29ror5Qr5LkvVVrfirI2Q`，团队 `team_5PStP92UpvRMDDmgwETD0rPe`）。
 - **线上域名**：`plonguo.com` / `www.plonguo.com`，经 Cloudflare 代理到 Vercel。
-- **内容语言**：站点面向英文读者，所有面向访客的文案用英文。源简历是中文，需要翻译。
+- **内容语言**：英文面向英文读者，简体中文面向国内公司；作品集内容及界面完整双语，博客文章标题、摘要和正文保持英文。双语与 SEO 一起纳入 Phase 3，不先迁成单语言再改路由。
+- **项目徽章**：Phase 1 新增 `showActiveBadge`，现有每个项目显式为 `false`；首页和 Lab 使用共享 ActiveBadge，Demo 按钮仍由 `demoUrl` 控制。
+- **正式地址**：首页、Lab、博客列表使用 `/en`、`/zh` 语言段；文章仅 `/en/blog/[slug]`。旧地址以 308 永久跳转保留可达性；具体映射以新增 spec 为准。
 - **不添加自测题章节**到任何文档或页面。
 
 ---
@@ -118,6 +122,8 @@ REVOKE ALL ON public.github_commits_cache FROM anon, authenticated;
 
 ### Phase 3 与 Phase 4（Next.js 目标结构）
 
+> 以下是 2026-10-09 的单语言结构历史示例。实际路径由新实施计划及 PB-02–09 明确：`app/[lang]`、共享元数据与双语字典，文章仅英文，现有展示组件保留在 `src/components/`。不直接复制此旧结构。
+
 ```
 app/
   layout.tsx                    # 根布局：字体、主题注入脚本、全局 metadata
@@ -147,6 +153,8 @@ public/images/                  # 压缩后的图片
 ---
 
 ## Phase 1：内容更新
+
+> 2026-10-13 新增：项目级 Active 显示开关与共享组件纳入本阶段，目标是全部关闭且保留 Demo。步骤见 PB-01；尚未实现，当前未提交内容改动不自动视为通过验收。
 
 **这一阶段结束后应该能立刻部署、立刻有价值。** 全部改动集中在 `src/data/portfolio.ts` 和几个展示组件，不涉及架构。
 
@@ -1620,6 +1628,8 @@ git commit -m "fix(api): escape contact form HTML, add CORS, rate limit and Turn
 
 ## Phase 3：Next.js 迁移
 
+> 2026-10-13 调整：本阶段同时完成双语路由、中文作品集、统一字体与双语 SEO，按新计划 PB-02–10 执行。Task 13 API 迁移及 Task 16 图片优化部分保留，放入新依赖顺序；其余冲突示例已被票据替代，历史 Expected 不能作为新完成条件。
+
 **目标**：解决 Phase 1/2 无法解决的三个结构性问题 —— SEO 全站空白、9MB 头像、507KB 单体 bundle —— 并为 Phase 4 的 AI SDK 重写提供 App Router 的流式能力。
 
 > **迁移策略**：一次搬一层，每步都能构建成功。不要一次性重写全部。
@@ -2544,6 +2554,8 @@ git commit -m "feat(seo): per-page metadata, sitemap and robots"
 ---
 
 ### Task 16: 图片优化与主题闪烁修复
+
+> 2026-10-15 执行入口：保留的图片部分已整理为独立 [PB-09A](../tickets/2026-10-13-portfolio-bilingual-and-active-badge-design/PB-09A-image-optimization.md)，位于PB-09之后、PB-10总验收之前。主题闪烁由PB-05/06实现并验收，仅做回归。以下单语言路径、priority与提交命令是历史示例，不直接执行；本轮不提交、推送或部署。
 
 **Files:**
 - Modify: `public/images/self-pic.jpg`（压缩）

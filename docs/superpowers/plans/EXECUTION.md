@@ -1,10 +1,25 @@
 # 执行协议（每个新 session 开工前读这个）
 
+## 当前发布状态（2026-10-15，覆盖下方历史状态）
+
+用户明确“都通过”，并授权提交、推送迁移分支、配置 Vercel、Preview 验证及 Production 构建发布。PB-01–10 和 DeepSeek→OpenAI 追加验收通过，Phase 3 收尾；Phase 4 未开始。TUN 恢复后复验：真实聊天200且完整DONE；无效验证码403；GitHub fresh200后缓存命中200；受控DeepSeek503后真实OpenAI200非空回复。此前网络失败记录保留为历史，不再是当前阻塞。发布执行中；部署结果以本轮交付及Vercel实际状态为准。
+
 配套计划：`2026-10-09-portfolio-content-and-nextjs-migration.md`
+
+## 当前票据状态（2026-10-15，优先于下方历史执行模板）
+
+- **逐票审核规则（用户最新指令）：** 每次只执行一个 ticket，完成其实现、验证和结果汇报后立即停止，等待用户明确审核通过并同意继续，才能开始下一个。不得预先编码后续票据，也不得把前置 Task 当作自动继续的例外；前置工作如需单独执行，先明确本次执行范围。审核修改仍归当前 ticket，修正后再次等待审核。
+- **当前审核门：** PB-04A 已获用户审核通过。PB-05 及审核回修已完成，本轮逐项人工验收均获用户确认通过，PB-06（含主题脚本与 Hero 审核回修）已获用户于2026-10-15审核通过，PB-07及紧凑入口回修均获用户审核通过；PB-08核心字体/排版及warning回修均获用户审核通过；PB-09已获用户审核通过；PB-09A图片优化已获用户审核通过；PB-10清理与自动验收通过、整体尚未完成，AC-13当前真实接口因Supabase连接重置未通过。历史真实Next邮件发送/收件已确认；本轮GitHub fresh200已验证，缓存写入及聊天/邮件成功路径受网络阻塞，真实验证码重放仍未验证；用户本轮已确认中文事实及两份PDF内容/语言准确。
+
+- 先阅读[Active 与双语 spec](../specs/2026-10-13-portfolio-bilingual-and-active-badge-design.md)和[实施计划入口](2026-10-13-portfolio-bilingual-and-active-badge.md)。
+- 用户已授权逐票实现；PB-01–04 已实现并完成技术验收，PB-04A 已获用户审核通过，PB-05 本轮逐项人工审核通过。PB-05 原完整33项浏览器回归、回修后的120 unit与新增4项专项浏览器验证均有记录；构建/typecheck/lint通过。PB-06含审核回修新增22 unit、19项生产浏览器用例；全套142 unit/56生产浏览器、另2项开发模式回归、构建/typecheck/lint通过，用户已确认PB-06及回修审核通过。无 Navigation API 的旧浏览器保留源页并提示失败，这项兼容边界仍保留。PB-07新增29 unit/9项浏览器（含紧凑入口回修）；全套171 unit/65 production浏览器、另6项dev专项、构建/typecheck/lint通过，核心及入口回修已审核通过。PB-08新增9 unit/18项字体排版浏览器；全套180 unit/83 production浏览器、另20项localhost dev专项、构建/typecheck/lint通过。两语冷缓存字体各181024bytes（176.8KiB），预算512000bytes；1byte负例非零退出。PB-08核心审核通过；warning回修后全量180 unit/86 production浏览器及5项dev专项、构建/typecheck/lint通过，用户已确认回修通过。菜单focus顺序及favicon404已修，Cloudflare iframe两条warning保留第三方边界，字体预加载在新页面与用户强刷后未再现。PB-09新增23 unit/8项SEO浏览器；全套203 unit/94 production浏览器通过，另dev与独立Preview各8项专项通过，Production/Preview构建通过并恢复Production。初始HTML、15个sitemap地址、9张OG图、索引规则已验证并获用户审核通过。PB-09A图片优化新增2 unit/8图片浏览器用例，最终205 unit/102 Production浏览器通过，构建/typecheck/lint/内容校验通过，用户已审核通过。PB-10清理与自动验收209 unit/108 Production浏览器通过（含IME回修）；当前Supabase网络失败使AC-13未通过，整体尚未关闭。新增叶子页面须自行枚举静态语言（PB-07 bottom-up Ruling）。详见 [progress.md](../tickets/2026-10-13-portfolio-bilingual-and-active-badge-design/progress.md)。
+- 当前分支 nextjs-migration；保留原工作区修改。已执行构建、单元与浏览器测试；不自动提交、推送或部署。暂停时更新进度，下次必须先读记录，不重复已完成工作。
+- PB-01 加入 Phase 1；原 Phase 2 保留；Phase 3 的冲突单语言步骤由 PB-02–10 替代，原 Task 13 已由 PB-04A 完成并审核通过；Task 16 图片部分已由 PB-09A 完成并审核通过，不重复执行。顺序详见实施计划，不直接复制历史模板。
+- 保留已有未提交和已暂存改动。任何后续提交都仅暂存当前任务的明确文件，不使用旧示例中的 `git add -A`；没有用户指令或已授权实施工作流时不自动提交、推送或部署。
 
 ---
 
-## 一、复制这段开新 session
+## 一、历史执行模板（已由新实施计划及票据入口替代）
 
 **跑 Phase 1 + 2：**
 

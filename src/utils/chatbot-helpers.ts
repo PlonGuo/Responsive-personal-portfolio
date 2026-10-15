@@ -15,9 +15,9 @@ export function estimateTokens(text: string): number {
 /**
  * Format timestamp to readable time (e.g., "2:30 PM")
  */
-export function formatMessageTime(timestamp: number): string {
+export function formatMessageTime(timestamp: number, locale = 'en-US'): string {
   const date = new Date(timestamp);
-  return date.toLocaleTimeString('en-US', {
+  return date.toLocaleTimeString(locale, {
     hour: '2-digit',
     minute: '2-digit',
   });

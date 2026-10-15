@@ -1,0 +1,156 @@
+{
+  "nav": {
+    "home": "首页",
+    "about": "关于我",
+    "skills": "技能",
+    "qualifications": "教育与经历",
+    "portfolio": "作品集",
+    "contact": "联系我",
+    "blog": "博客",
+    "lab": "实验室"
+  },
+  "actions": {
+    "activeBadge": "运行中",
+    "demo": "演示",
+    "source": "源码",
+    "downloadResume": "下载简历",
+    "downloadEnglishResume": "下载英文简历",
+    "downloadChineseResume": "下载中文简历",
+    "contactMe": "联系我",
+    "backHome": "返回首页",
+    "backBlog": "返回博客列表",
+    "viewAllPosts": "查看全部文章",
+    "seeMoreProjects": "在实验室查看全部项目",
+    "chineseIndex": "中文目录 / Chinese index",
+    "english": "English",
+    "chinese": "简体中文"
+  },
+  "sections": {
+    "welcome": "欢迎来到我的个人作品集！",
+    "greeting": "你好，我是",
+    "about": "关于我",
+    "aboutSubtitle": "个人介绍",
+    "projectsStat": "完成的项目",
+    "companiesStat": "实习与工作公司",
+    "skills": "技能",
+    "skillsSubtitle": "技术栈与实践方向",
+    "qualifications": "教育与经历",
+    "journey": "我的学习与实践经历",
+    "education": "教育背景",
+    "experience": "实习经历",
+    "portfolio": "作品集",
+    "portfolioSubtitle": "近期作品",
+    "contact": "联系我",
+    "contactSubtitle": "欢迎交流",
+    "lab": "项目实验室",
+    "labBadge": "实验站",
+    "labSubtitle": "实验、项目与原型的集合",
+    "footerRights": "保留所有权利。",
+    "projectHighlights": "项目亮点"
+  },
+  "forms": {
+    "call": "电话",
+    "email": "邮箱",
+    "invitation": "想一起合作？",
+    "letsTalk": "聊一聊",
+    "name": "你的姓名",
+    "emailPlaceholder": "你的邮箱",
+    "subject": "主题",
+    "message": "留言内容",
+    "verification": "请完成验证后再发送留言。",
+    "sending": "发送中…",
+    "sent": "已发送！",
+    "retry": "重试",
+    "send": "发送留言"
+  },
+  "chat": {
+    "title": "Jason 的 AI 助手",
+    "subtitle": "欢迎提问！",
+    "welcome": "你好，我是 Jason！👋",
+    "welcomeBody": "你可以询问我的技能、项目或经历，我很乐意与你交流。",
+    "verify": "请完成验证后继续聊天",
+    "verifyPlaceholder": "请先完成验证…",
+    "placeholder": "输入你的问题…",
+    "thinking": "思考中…",
+    "disclaimer": "AI 回复可能不准确。",
+    "questionSkills": "你有哪些技能？",
+    "questionProjects": "介绍一下你的项目",
+    "questionExperience": "你有哪些实习经历？",
+    "verified": "验证已完成"
+  },
+  "updates": {
+    "title": "最近更新",
+    "empty": "暂无提交记录",
+    "all": "查看全部提交",
+    "loading": "正在加载更新…",
+    "justNow": "刚刚",
+    "minutesAgo": "{count} 分钟前",
+    "hoursAgo": "{count} 小时前",
+    "daysAgo": "{count} 天前"
+  },
+  "blog": {
+    "title": "博客",
+    "eyebrow": "我的博客",
+    "latest": "最新文章",
+    "subtitle": "开发过程中的思考、教程与实践记录",
+    "filter": "按标签筛选",
+    "all": "全部",
+    "empty": "该标签下暂无文章。",
+    "readTime": "阅读约 {count} 分钟",
+    "englishArticle": "英文文章"
+  },
+  "a11y": {
+    "language": "语言",
+    "switchToChinese": "切换到简体中文",
+    "switchToEnglish": "切换到英语",
+    "currentLanguage": "当前语言",
+    "menu": "展开或关闭菜单",
+    "closeMenu": "关闭菜单",
+    "lightTheme": "切换到浅色模式",
+    "darkTheme": "切换到深色模式",
+    "previousProject": "上一个项目",
+    "nextProject": "下一个项目",
+    "project": "查看第 {count} 个项目",
+    "scrollTop": "返回顶部",
+    "scrollAbout": "前往关于我",
+    "openChat": "打开聊天助手",
+    "closeChat": "关闭聊天",
+    "chatDialog": "与 Jason 的 AI 助手交流",
+    "chatInput": "输入问题",
+    "sendChat": "发送问题",
+    "updates": "查看最近更新",
+    "refresh": "刷新",
+    "close": "关闭",
+    "loading": "加载中",
+    "avatar": "过汇智融",
+    "stopChat": "停止回复"
+  },
+  "errors": {
+    "generic": "操作失败，请重试。",
+    "rateLimit": "请求过于频繁，请稍后重试。",
+    "verification": "请完成验证后重试。",
+    "validation": "请检查输入内容后重试。",
+    "navigation": "语言切换失败，请重试。"
+  },
+  "skillCategories": {
+    "ai": "AI / Agent",
+    "language": "编程语言",
+    "framework": "框架",
+    "data": "数据库",
+    "tool": "工具与 DevOps"
+  },
+  "seo": {
+    "home": {
+      "title": "过汇智融（Jason）— AI Agent 与大模型应用工程师",
+      "description": "AI Agent 与大模型应用开发，具备全栈工程和生产后端经验，拥有中美实习经历，习惯用量化评测驱动技术选型。"
+    },
+    "lab": {
+      "title": "项目实验室 — 过汇智融",
+      "description": "过汇智融的项目、原型与工程实验，涵盖 AI Agent、检索、实时通信与全栈应用。"
+    },
+    "blog": {
+      "title": "博客 — 过汇智融",
+      "description": "开发实践、技术教程与项目记录。文章正文保留英文，中文目录方便浏览。"
+    }
+  }
+}

@@ -1,53 +1,30 @@
-import { useState } from 'react';
+'use client';
+
+import { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Phone, Mail, Send, CheckCircle, AlertCircle } from 'lucide-react';
-import { contactInfo } from '../data/portfolio';
+import type { ContactInfo } from '../types';
+import type { Dictionary } from '../../lib/i18n/types';
+import TurnstileWidget from './TurnstileWidget';
 
-type FormStatus = 'idle' | 'loading' | 'success' | 'error';
+import { useContactDraft } from '../hooks/useContactDraft';
+import { getErrorMessage } from '../../lib/i18n/errors';
+import type { ContactForm } from '../../lib/client/session';
 
-export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-  const [status, setStatus] = useState<FormStatus>('idle');
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+export default function Contact({ contactInfo, siteKey, copy }: {
+  contactInfo: ContactInfo; siteKey: string;
+  copy: Pick<Dictionary, 'sections' | 'forms' | 'errors'>;
+}) {
+  const { formData, status, errorCode, verificationVersion, setField, submit } = useContactDraft();
+  const [verification, setVerification] = useState<{ value: string | null; version: number }>({ value: null, version: verificationVersion });
+  const turnstileToken = verification.version === verificationVersion ? verification.value : null;
+  const onToken = useCallback((value: string | null) => setVerification({ value, version: verificationVersion }), [verificationVersion]);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setField(event.target.name as keyof ContactForm, event.target.value);
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('loading');
-
-    try {
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send email');
-      }
-
-      setStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      setTimeout(() => setStatus('idle'), 3000);
-    } catch (error) {
-      console.error('Error sending email:', error);
-      setStatus('error');
-      setTimeout(() => setStatus('idle'), 3000);
-    }
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (turnstileToken) void submit(turnstileToken);
   };
 
   return (
@@ -58,22 +35,22 @@ export default function Contact() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-4">
-            Contact Me
+            {copy.sections.contact}
           </h2>
-          <p className="text-slate-600 dark:text-slate-400">Get in touch</p>
+          <p className="text-slate-600 dark:text-slate-400">{copy.sections.contactSubtitle}</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Information */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
@@ -86,7 +63,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-heading font-semibold text-slate-900 dark:text-white mb-2">
-                  Call Me
+                  {copy.forms.call}
                 </h3>
                 {contactInfo.phone.map((phone, index) => (
                   <p
@@ -106,7 +83,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-heading font-semibold text-slate-900 dark:text-white mb-2">
-                  E-mail
+                  {copy.forms.email}
                 </h3>
                 {contactInfo.email.map((email, index) => (
                   <a
@@ -123,14 +100,14 @@ export default function Contact() {
 
           {/* Contact Form */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <h3 className="font-heading font-semibold text-xl text-slate-900 dark:text-white mb-6">
-              Interested to work together? –{' '}
-              <span className="text-primary">Let's talk</span>
+              {copy.forms.invitation}{' '}
+              <span className="text-primary">{copy.forms.letsTalk}</span>
             </h3>
 
             <form
@@ -143,7 +120,7 @@ export default function Contact() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Your Name"
+                  placeholder={copy.forms.name} aria-label={copy.forms.name}
                   required
                   className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 />
@@ -152,7 +129,7 @@ export default function Contact() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Your Email"
+                  placeholder={copy.forms.emailPlaceholder} aria-label={copy.forms.emailPlaceholder}
                   required
                   className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 />
@@ -162,7 +139,7 @@ export default function Contact() {
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder="Subject"
+                placeholder={copy.forms.subject} aria-label={copy.forms.subject}
                 required
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
               />
@@ -170,15 +147,28 @@ export default function Contact() {
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="Your Message"
+                placeholder={copy.forms.message} aria-label={copy.forms.message}
                 required
                 rows={5}
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
               />
 
+              <TurnstileWidget
+                siteKey={siteKey}
+                resetKey={verificationVersion}
+                onToken={onToken}
+              />
+              {!turnstileToken && (
+                <p className="text-sm text-slate-500 dark:text-slate-400" role="status">
+                  {copy.forms.verification}
+                </p>
+              )}
+
+              {errorCode && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{getErrorMessage(errorCode, copy)}</p>}
+
               <button
                 type="submit"
-                disabled={status === 'loading'}
+                disabled={status === 'loading' || !turnstileToken}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:bg-primary-dark text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {status === 'loading' ? (
@@ -204,21 +194,21 @@ export default function Contact() {
                         />
                       </svg>
                     </span>
-                    Sending...
+                    {copy.forms.sending}
                   </>
                 ) : status === 'success' ? (
                   <>
                     <CheckCircle size={20} />
-                    Message Sent!
+                    {copy.forms.sent}
                   </>
                 ) : status === 'error' ? (
                   <>
                     <AlertCircle size={20} />
-                    Try Again
+                    {copy.forms.retry}
                   </>
                 ) : (
                   <>
-                    Send Message
+                    {copy.forms.send}
                     <Send size={20} />
                   </>
                 )}

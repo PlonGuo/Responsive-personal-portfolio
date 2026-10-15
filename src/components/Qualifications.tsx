@@ -1,29 +1,36 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import { GraduationCap, Briefcase, Rocket } from 'lucide-react';
-import { education, experience } from '../data/portfolio';
+import type { Education, Experience } from '../types';
+import type { Dictionary } from '../../lib/i18n/types';
 
-export default function Qualifications() {
+export default function Qualifications({ education, experience, copy }: {
+  education: Array<Education & { id: string }>;
+  experience: Array<Experience & { id: string }>;
+  copy: Pick<Dictionary, 'sections'>;
+}) {
   return (
     <section id="qualifications" className="py-20 lg:py-32 bg-white dark:bg-slate-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-4">
-            Qualification
+            {copy.sections.qualifications}
           </h2>
-          <p className="text-slate-600 dark:text-slate-400">My personal journey</p>
+          <p className="text-slate-600 dark:text-slate-400">{copy.sections.journey}</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Education Timeline */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
@@ -31,7 +38,7 @@ export default function Qualifications() {
             <div className="flex items-center gap-3 mb-8">
               <GraduationCap className="w-8 h-8 text-primary" />
               <h3 className="text-xl font-heading font-semibold text-slate-900 dark:text-white">
-                Education
+                {copy.sections.education}
               </h3>
             </div>
 
@@ -41,8 +48,8 @@ export default function Qualifications() {
 
               {education.map((item, index) => (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
+                  key={item.id}
+                  initial={false}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
@@ -50,7 +57,7 @@ export default function Qualifications() {
                 >
                   {/* Timeline dot */}
                   <div className="absolute left-0 w-8 h-8 rounded-full bg-white dark:bg-slate-900 border-2 border-primary flex items-center justify-center z-10">
-                    <span className="text-xs font-bold text-primary">{item.year}</span>
+                    <span className="text-[10px] leading-none tabular-nums whitespace-nowrap font-bold text-primary">{item.year}</span>
                   </div>
 
                   {/* Content card */}
@@ -77,7 +84,7 @@ export default function Qualifications() {
 
               {/* Rocket at the end */}
               <motion.div
-                initial={{ opacity: 0 }}
+                initial={false}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.4 }}
@@ -90,7 +97,7 @@ export default function Qualifications() {
 
           {/* Experience Timeline */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -98,7 +105,7 @@ export default function Qualifications() {
             <div className="flex items-center gap-3 mb-8">
               <Briefcase className="w-8 h-8 text-secondary" />
               <h3 className="text-xl font-heading font-semibold text-slate-900 dark:text-white">
-                Experience
+                {copy.sections.experience}
               </h3>
             </div>
 
@@ -108,8 +115,8 @@ export default function Qualifications() {
 
               {experience.map((item, index) => (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: 20 }}
+                  key={item.id}
+                  initial={false}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
@@ -117,7 +124,7 @@ export default function Qualifications() {
                 >
                   {/* Timeline dot */}
                   <div className="absolute left-0 w-8 h-8 rounded-full bg-white dark:bg-slate-900 border-2 border-secondary flex items-center justify-center z-10">
-                    <span className="text-xs font-bold text-secondary">{item.year}</span>
+                    <span className="text-[10px] leading-none tabular-nums whitespace-nowrap font-bold text-secondary">{item.year}</span>
                   </div>
 
                   {/* Content card */}
@@ -157,7 +164,7 @@ export default function Qualifications() {
 
               {/* Rocket at the end */}
               <motion.div
-                initial={{ opacity: 0 }}
+                initial={false}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.5 }}

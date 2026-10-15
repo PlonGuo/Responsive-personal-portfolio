@@ -1,0 +1,156 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "skills": "Skills",
+    "qualifications": "Qualifications",
+    "portfolio": "Portfolio",
+    "contact": "Contact",
+    "blog": "Blog",
+    "lab": "Lab"
+  },
+  "actions": {
+    "activeBadge": "Active",
+    "demo": "Demo",
+    "source": "GitHub",
+    "downloadResume": "Download CV",
+    "downloadEnglishResume": "Download CV (EN)",
+    "downloadChineseResume": "Download CV (ZH)",
+    "contactMe": "Contact Me",
+    "backHome": "Back to Home",
+    "backBlog": "Back to all posts",
+    "viewAllPosts": "View All Posts",
+    "seeMoreProjects": "See more projects in the Lab",
+    "chineseIndex": "中文目录 / Chinese index",
+    "english": "English",
+    "chinese": "简体中文"
+  },
+  "sections": {
+    "welcome": "Welcome to my Portfolio Website!",
+    "greeting": "Hey, I’m",
+    "about": "About",
+    "aboutSubtitle": "My introduction",
+    "projectsStat": "Completed Projects",
+    "companiesStat": "Companies Worked",
+    "skills": "Skillset",
+    "skillsSubtitle": "My technical level",
+    "qualifications": "Qualification",
+    "journey": "My personal journey",
+    "education": "Education",
+    "experience": "Experience",
+    "portfolio": "Portfolio",
+    "portfolioSubtitle": "My most recent works",
+    "contact": "Contact Me",
+    "contactSubtitle": "Get in touch",
+    "lab": "The Lab",
+    "labBadge": "Experiment Station",
+    "labSubtitle": "A collection of experiments, projects, and prototypes",
+    "footerRights": "All rights reserved.",
+    "projectHighlights": "Project highlights"
+  },
+  "forms": {
+    "call": "Call Me",
+    "email": "E-mail",
+    "invitation": "Interested to work together?",
+    "letsTalk": "Let’s talk",
+    "name": "Your Name",
+    "emailPlaceholder": "Your Email",
+    "subject": "Subject",
+    "message": "Your Message",
+    "verification": "Complete the verification before sending your message.",
+    "sending": "Sending...",
+    "sent": "Message Sent!",
+    "retry": "Try Again",
+    "send": "Send Message"
+  },
+  "chat": {
+    "title": "Jason’s AI Assistant",
+    "subtitle": "Ask me anything!",
+    "welcome": "Hi, I’m Jason! 👋",
+    "welcomeBody": "Ask me anything about my skills, projects, or experience. I’m here to help!",
+    "verify": "Please verify to continue chatting",
+    "verifyPlaceholder": "Complete verification first...",
+    "placeholder": "Type your message...",
+    "thinking": "Thinking...",
+    "disclaimer": "AI responses may be inaccurate.",
+    "questionSkills": "What are your skills?",
+    "questionProjects": "Tell me about your projects",
+    "questionExperience": "What is your experience?",
+    "verified": "Verification complete"
+  },
+  "updates": {
+    "title": "Recent Updates",
+    "empty": "No commits found",
+    "all": "View all commits",
+    "loading": "Loading updates...",
+    "justNow": "Just now",
+    "minutesAgo": "{count}m ago",
+    "hoursAgo": "{count}h ago",
+    "daysAgo": "{count}d ago"
+  },
+  "blog": {
+    "title": "Blog",
+    "eyebrow": "From My Blog",
+    "latest": "Latest Posts",
+    "subtitle": "Thoughts, tutorials, and insights from my development journey",
+    "filter": "Filter by tag",
+    "all": "All",
+    "empty": "No posts found with this tag.",
+    "readTime": "{count} min read",
+    "englishArticle": "English article"
+  },
+  "a11y": {
+    "language": "Language",
+    "currentLanguage": "Current language",
+    "switchToChinese": "Switch to Simplified Chinese",
+    "switchToEnglish": "Switch to English",
+    "menu": "Toggle menu",
+    "closeMenu": "Close menu",
+    "lightTheme": "Switch to light mode",
+    "darkTheme": "Switch to dark mode",
+    "previousProject": "Previous project",
+    "nextProject": "Next project",
+    "project": "Go to project {count}",
+    "scrollTop": "Scroll to top",
+    "scrollAbout": "Scroll to About section",
+    "openChat": "Open chat assistant",
+    "closeChat": "Close chat",
+    "chatDialog": "Chat with Jason’s AI Assistant",
+    "chatInput": "Type your message",
+    "sendChat": "Send message",
+    "updates": "View recent updates",
+    "refresh": "Refresh",
+    "close": "Close",
+    "loading": "Loading",
+    "avatar": "Jason Guo",
+    "stopChat": "Stop response"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "rateLimit": "Too many requests. Please try again later.",
+    "verification": "Please complete the verification and try again.",
+    "validation": "Please check your input and try again.",
+    "navigation": "Could not switch language. Please try again."
+  },
+  "skillCategories": {
+    "ai": "AI / Agent",
+    "language": "Languages",
+    "framework": "Frameworks",
+    "data": "Databases",
+    "tool": "Tools & DevOps"
+  },
+  "seo": {
+    "home": {
+      "title": "Huizhirong (Jason) Guo — AI Agent & LLM Application Engineer",
+      "description": "AI Agent and LLM application engineer with full-stack and production backend experience."
+    },
+    "lab": {
+      "title": "The Lab — Jason Guo",
+      "description": "Projects, prototypes, and engineering experiments by Jason Guo."
+    },
+    "blog": {
+      "title": "Blog — Jason Guo",
+      "description": "Engineering notes, tutorials, and project stories by Jason Guo. Articles are in English."
+    }
+  }
+}

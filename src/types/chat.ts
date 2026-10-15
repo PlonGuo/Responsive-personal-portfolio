@@ -1,3 +1,5 @@
+import type { UIErrorCode } from '../../lib/i18n/errors';
+
 // Message types
 export type MessageRole = 'user' | 'assistant';
 
@@ -18,7 +20,7 @@ export interface ChatState {
   messageCount: number;
   turnstileToken: string | null;
   needsVerification: boolean;
-  error: string | null;
+  error: UIErrorCode | null;
 }
 
 // API request/response types
@@ -43,6 +45,7 @@ declare global {
         element: string | HTMLElement,
         options: {
           sitekey: string;
+          action?: string;
           callback: (token: string) => void;
           'expired-callback'?: () => void;
           'error-callback'?: () => void;

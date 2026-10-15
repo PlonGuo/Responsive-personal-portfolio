@@ -1,14 +1,12 @@
-import { useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronDown, Linkedin, Github, Instagram } from 'lucide-react';
-import { personalInfo, socialLinks } from '../data/portfolio';
+'use client';
 
-const typewriterTexts = [
-  'Huizhirong Guo',
-  'a Full-Stack Developer',
-  'a Software Engineer',
-  'a Problem Solver',
-];
+import { motion, useReducedMotion } from 'framer-motion';
+import { ChevronDown, Linkedin, Github, Instagram } from 'lucide-react';
+import type { PortfolioProfile } from '../../lib/content/types';
+import type { SocialLink } from '../types';
+import type { Dictionary } from '../../lib/i18n/types';
+import { useTypewriter } from '../hooks/useTypewriter';
+
 
 // Bluesky icon as inline SVG since lucide doesn't have it
 const BlueskyIcon = () => (
@@ -40,52 +38,19 @@ const socialIcons: Record<string, React.ReactNode> = {
   medium: <MediumIcon />,
 };
 
-export default function Hero() {
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  const [displayText, setDisplayText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+interface HeroProps {
+  profile: PortfolioProfile;
+  lines: string[];
+  socialLinks: SocialLink[];
+  copy: Pick<Dictionary, 'sections' | 'actions' | 'a11y'>;
+}
 
-  useEffect(() => {
-    const currentFullText = typewriterTexts[currentTextIndex];
-    const typingSpeed = isDeleting ? 50 : 100;
-    const pauseTime = 2000;
-
-    // Clear any existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    if (!isDeleting && displayText === currentFullText) {
-      timeoutRef.current = setTimeout(() => setIsDeleting(true), pauseTime);
-      return;
-    }
-
-    if (isDeleting && displayText === '') {
-      timeoutRef.current = setTimeout(() => {
-        setIsDeleting(false);
-        setCurrentTextIndex((prev) => (prev + 1) % typewriterTexts.length);
-      }, 100);
-      return;
-    }
-
-    timeoutRef.current = setTimeout(() => {
-      setDisplayText((prev) =>
-        isDeleting
-          ? prev.slice(0, -1)
-          : currentFullText.slice(0, prev.length + 1)
-      );
-    }, typingSpeed);
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [displayText, isDeleting, currentTextIndex]);
+export default function Hero({ profile: personalInfo, lines, socialLinks, copy }: HeroProps) {
+  const reduced = useReducedMotion();
+  const displayText = useTypewriter(lines, Boolean(reduced));
 
   const scrollToAbout = () => {
-    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('about')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   };
 
   return (
@@ -99,7 +64,7 @@ export default function Hero() {
       {/* Animated background shapes */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          animate={{
+          animate={reduced ? undefined : {
             scale: [1, 1.2, 1],
             rotate: [0, 90, 0],
           }}
@@ -111,7 +76,7 @@ export default function Hero() {
           className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full blur-3xl"
         />
         <motion.div
-          animate={{
+          animate={reduced ? undefined : {
             scale: [1.2, 1, 1.2],
             rotate: [90, 0, 90],
           }}
@@ -128,7 +93,7 @@ export default function Hero() {
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Social Links - Vertical on desktop */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={false}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="hidden lg:flex flex-col gap-4"
@@ -149,43 +114,52 @@ export default function Hero() {
 
           {/* Main Content */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="flex-1 text-center"
           >
             <motion.p
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               className="text-primary font-medium mb-4"
             >
-              Welcome to my Portfolio Website!
+              {copy.sections.welcome}
             </motion.p>
 
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold text-slate-900 dark:text-white mb-4"
             >
-              Hey I'm
+              {copy.sections.greeting + " " + personalInfo.shortName}
             </motion.h1>
 
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
               className="h-16 sm:h-20 flex items-center justify-center mb-6"
             >
-              <span className="text-2xl sm:text-3xl lg:text-4xl font-heading font-semibold text-primary">
+              <span data-typewriter className="text-2xl sm:text-3xl lg:text-4xl font-heading font-semibold text-primary">
                 {displayText}
-                <span className="animate-pulse">|</span>
+                <span aria-hidden="true" className="animate-pulse motion-reduce:hidden">|</span>
               </span>
             </motion.div>
 
             <motion.p
-              initial={{ opacity: 0 }}
+              initial={false}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.55 }}
+              className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mt-2"
+            >
+              {personalInfo.title}
+            </motion.p>
+
+            <motion.p
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
               className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed"
@@ -195,7 +169,7 @@ export default function Hero() {
 
             {/* Social Links - Horizontal on mobile */}
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
               className="flex lg:hidden justify-center gap-4 mb-8"
@@ -215,7 +189,7 @@ export default function Hero() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
             >
@@ -225,11 +199,11 @@ export default function Hero() {
                   e.preventDefault();
                   document
                     .getElementById('contact')
-                    ?.scrollIntoView({ behavior: 'smooth' });
+                    ?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
                 }}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-dark text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 cursor-pointer"
               >
-                Contact Me
+                {copy.actions.contactMe}
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -249,14 +223,14 @@ export default function Hero() {
             {/* Scroll Down Indicator */}
             <motion.button
               onClick={scrollToAbout}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, y: [0, 10, 0] }}
+              initial={false}
+              animate={reduced ? { opacity: 1, y: 0 } : { opacity: 1, y: [0, 10, 0] }}
               transition={{
                 opacity: { delay: 1 },
                 y: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
               }}
               className="mt-12 text-primary hover:text-primary-dark transition-colors cursor-pointer"
-              aria-label="Scroll to About section"
+              aria-label={copy.a11y.scrollAbout}
             >
               <ChevronDown size={40} />
             </motion.button>

@@ -24,3 +24,14 @@ dist-ssr
 *.sw?
 .vercel
 .env*.local
+
+# Local Claude Code configuration and skills
+/.claude/
+
+# Next.js and browser verification output
+.next/
+next-env.d.ts
+*.tsbuildinfo
+playwright-report/
+test-results/
+.gstack/

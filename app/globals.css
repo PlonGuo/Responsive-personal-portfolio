@@ -1,0 +1,430 @@
+@import "tailwindcss";
+
+/* Use class-based dark mode instead of system preference */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Colors - Primary */
+  --color-primary: #3B82F6;
+  --color-primary-dark: #2563EB;
+  --color-primary-light: #60A5FA;
+  --color-secondary: #8B5CF6;
+  --color-accent: #06B6D4;
+
+  /* Fonts */
+  --font-heading: var(--font-sans), 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-body: var(--font-sans), 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+  background: #f8fafc;
+  background-attachment: fixed;  /* 固定背景,防止 overscroll 白屏 */
+  transition: background-color 0.3s;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+html.dark {
+  background-color: #0f172a;
+}
+
+body {
+  font-family: var(--font-body);
+  overflow-wrap: anywhere;
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  transition: background-color 0.3s;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body.dark,
+html.dark body {
+  background-color: #0f172a;
+}
+
+/* Fix overscroll bounce background - extend much further */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200vh;  /* 扩大到 200vh 覆盖更大的 bounce */
+  left: 0;
+  right: 0;
+  height: 200vh;
+  background-color: #f8fafc;
+  z-index: -9999;
+  pointer-events: none;
+  transition: background-color 0.3s;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -200vh;  /* 扩大到 200vh */
+  left: 0;
+  right: 0;
+  height: 200vh;
+  background-color: #f8fafc;
+  z-index: -9999;
+  pointer-events: none;
+  transition: background-color 0.3s;
+}
+
+body.dark::before,
+body.dark::after {
+  background-color: #0f172a;
+}
+
+/* Additional fix: cover the entire root */
+#root {
+  position: relative;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  transition: background-color 0.3s;
+}
+
+.dark #root {
+  background-color: #0f172a;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Chinese paragraphs need breathing room; code keeps its original grid. */
+:lang(zh-CN) :where(p, li) { line-height: 1.75; }
+:lang(zh-CN) :where(h1, h2, h3, h4, h5, h6) { letter-spacing: normal; }
+pre, code { overflow-wrap: normal; }
+
+/* Keep navigation sharp while page content blurs progressively toward the top. */
+.site-header {
+  --header-tint: 255 255 255;
+  --header-veil: 0.25;
+}
+.dark .site-header,
+.site-header[data-tone="dark"] {
+  --header-tint: 15 23 42;
+}
+.site-header[data-scrolled="true"] { --header-veil: 0.45; }
+.language-dock {
+  left: calc(1.5rem + env(safe-area-inset-left));
+  bottom: calc(1.5rem + env(safe-area-inset-bottom));
+}
+.language-notice { left: 1rem; right: 6rem; bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
+@media (min-width: 768px) {
+  .language-notice { left: 1.5rem; right: auto; bottom: calc(6rem + env(safe-area-inset-bottom)); max-width: 20rem; }
+}
+.header-backdrop {
+  position: absolute;
+  inset: 0 0 -4rem;
+  pointer-events: none;
+}
+.header-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgb(var(--header-tint) / var(--header-veil)), transparent);
+}
+.header-blur {
+  position: absolute;
+  inset: 0;
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+  -webkit-mask-image: var(--blur-mask);
+  mask-image: var(--blur-mask);
+}
+.header-blur-soft {
+  --blur: 8px;
+  --blur-mask: linear-gradient(to bottom, #000 0%, #000 65%, transparent 100%);
+}
+.header-blur-medium {
+  --blur: 24px;
+  --blur-mask: linear-gradient(to bottom, #000 0%, #000 45%, transparent 85%);
+}
+.header-blur-strong {
+  --blur: 48px;
+  --blur-mask: linear-gradient(to bottom, #000 0%, #000 30%, transparent 65%);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header { background: rgb(var(--header-tint) / 0.97); }
+}
+
+/* Assistant Markdown is scoped to chat; user messages remain literal text. */
+.chat-markdown { min-width: 0; line-height: 1.65; overflow-wrap: anywhere; }
+.chat-markdown > :first-child { margin-top: 0; }
+.chat-markdown > :last-child { margin-bottom: 0; }
+.chat-markdown :where(p, ul, ol, pre, blockquote, table, hr) { margin-block: 0.65em; }
+.chat-markdown :where(h1, h2, h3, h4, h5, h6) { margin-block: 0.9em 0.4em; font: inherit; font-weight: 700; }
+.chat-markdown strong { font-weight: 700; }
+.chat-markdown ul { list-style: disc; padding-inline-start: 1.35em; }
+.chat-markdown ol { list-style: decimal; padding-inline-start: 1.6em; }
+.chat-markdown li + li { margin-top: 0.35em; }
+.chat-markdown li > p { margin-block: 0.3em; }
+.chat-markdown a { color: var(--color-primary); text-decoration: underline; text-underline-offset: 2px; }
+.chat-markdown blockquote { border-inline-start: 3px solid currentColor; padding-inline-start: 0.75em; }
+.chat-markdown :not(pre) > code { border-radius: 0.25rem; background: rgb(15 23 42 / 0.08); padding: 0.1em 0.3em; }
+.dark .chat-markdown :not(pre) > code { background: rgb(255 255 255 / 0.12); }
+.chat-markdown pre { max-width: 100%; overflow-x: auto; border-radius: 0.5rem; padding: 0.75rem; background: #0f172a; color: #e2e8f0; }
+.chat-markdown pre code { white-space: pre; overflow-wrap: normal; font-size: 0.8125rem; }
+.chat-table-scroll { max-width: 100%; overflow-x: auto; }
+.chat-markdown table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.chat-markdown :where(th, td) { border: 1px solid rgb(148 163 184 / 0.4); padding: 0.35em 0.5em; text-align: start; }
+
+/* Glass effect utilities */
+.glass {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.blog-prose { min-width: 0; color: #334155; font-size: 1.0625rem; line-height: 1.85; overflow-wrap: anywhere; }
+.dark .blog-prose { color: #cbd5e1; }
+.blog-prose :is(h1, h2, h3, h4) { color: #0f172a; font-weight: 700; line-height: 1.3; scroll-margin-top: 6rem; }
+.dark .blog-prose :is(h1, h2, h3, h4) { color: #f1f5f9; }
+.blog-prose h1 { margin: 1.5rem 0 2rem; font-size: clamp(2rem, 5vw, 2.75rem); }
+.blog-prose h2 { margin: 2.75rem 0 1rem; font-size: 1.625rem; }
+.blog-prose h3 { margin: 2rem 0 0.75rem; font-size: 1.25rem; }
+.blog-prose h4 { margin: 1.5rem 0 0.5rem; font-size: 1.125rem; }
+.blog-prose :is(p, ul, ol, blockquote, figure, pre, .blog-table-scroll) { margin-block: 1.25rem; }
+.blog-prose ul { list-style: disc; padding-left: 1.5rem; }
+.blog-prose ol { list-style: decimal; padding-left: 1.5rem; }
+.blog-prose li { margin-block: 0.35rem; }
+.blog-prose li :is(ul, ol) { margin-block: 0.5rem; }
+.blog-prose a { color: #2563eb; text-decoration: underline; text-underline-offset: 3px; }
+.dark .blog-prose a { color: #60a5fa; }
+.blog-prose blockquote { border-left: 3px solid #8b5cf6; padding-left: 1.25rem; color: #64748b; }
+.dark .blog-prose blockquote { color: #94a3b8; }
+.blog-prose code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.875em; }
+.blog-prose :not(pre) > code { border-radius: 0.25rem; background: #e2e8f0; padding: 0.125rem 0.35rem; }
+.dark .blog-prose :not(pre) > code { background: #1e293b; }
+.blog-prose pre { max-width: 100%; overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.25rem; white-space: pre; overflow-wrap: normal; font-size: 0.8125rem; line-height: 1.7; }
+.blog-prose pre code { font-size: inherit; }
+.blog-prose pre [data-line] { padding-inline: 0; }
+.blog-prose :is(pre, code)[data-theme], .blog-prose code[data-theme] span { color: var(--shiki-light); background-color: var(--shiki-light-bg); }
+.dark .blog-prose pre { border-color: #334155; }
+.dark .blog-prose :is(pre, code)[data-theme], .dark .blog-prose code[data-theme] span { color: var(--shiki-dark); background-color: var(--shiki-dark-bg); }
+.blog-prose .blog-table-scroll { max-width: 100%; overflow-x: auto; }
+.blog-prose table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+.blog-prose :is(th, td) { border: 1px solid #cbd5e1; padding: 0.625rem 0.875rem; text-align: left; }
+.blog-prose th { background: #e2e8f0; font-weight: 600; }
+.dark .blog-prose :is(th, td) { border-color: #334155; }
+.dark .blog-prose th { background: #1e293b; }
+.blog-prose img { max-width: 100%; height: auto; border-radius: 1rem; }
+.blog-prose hr { margin-block: 2.5rem; border-color: #cbd5e1; }
+.dark .blog-prose hr { border-color: #334155; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Selection color */
+::selection {
+  background: #3B82F6;
+  color: white;
+}
+
+/* ========================================
+   Theme Toggle - View Transition Ripple
+   ======================================== */
+
+/* Old snapshot stays frozen underneath */
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* New snapshot expands as a circle from the click point */
+::view-transition-new(root) {
+  mix-blend-mode: normal;
+  animation: theme-ripple 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes theme-ripple {
+  from {
+    clip-path: circle(0 at var(--ripple-x, 50%) var(--ripple-y, 50%));
+  }
+  to {
+    clip-path: circle(150vmax at var(--ripple-x, 50%) var(--ripple-y, 50%));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ========================================
+   Lab Page - Sci-Fi Theme Styles
+   ======================================== */
+
+/* Grid pattern background */
+.lab-grid-bg {
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Glowing border effect */
+.lab-glow-border {
+  box-shadow:
+    0 0 20px rgba(16, 185, 129, 0.3),
+    0 0 40px rgba(16, 185, 129, 0.2),
+    0 0 60px rgba(16, 185, 129, 0.1),
+    inset 0 0 20px rgba(16, 185, 129, 0.05);
+}
+
+/* Animated scan line */
+.lab-scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(16, 185, 129, 0.5),
+    transparent
+  );
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+/* Reduced motion for lab animations */
+@media (prefers-reduced-motion: reduce) {
+  .lab-scanline {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ========================================
+   Chatbot Button - Sci-Fi Glow Styles
+   ======================================== */
+
+/* Pulsing outer glow for chatbot button */
+.chatbot-btn-glow {
+  box-shadow:
+    0 0 20px rgba(6, 182, 212, 0.5),
+    0 0 40px rgba(6, 182, 212, 0.3),
+    0 0 60px rgba(59, 130, 246, 0.2);
+}
+
+/* Rotating ring animation */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-slow-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-spin-slow-reverse {
+  animation: spin-slow-reverse 4s linear infinite;
+}
+
+/* Pulse animation for glow */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(6, 182, 212, 0.5),
+      0 0 40px rgba(6, 182, 212, 0.3),
+      0 0 60px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(6, 182, 212, 0.6),
+      0 0 60px rgba(6, 182, 212, 0.4),
+      0 0 80px rgba(59, 130, 246, 0.3);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Reduced motion for chatbot animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow,
+  .animate-spin-slow-reverse,
+  .animate-pulse-glow {
+    animation: none;
+  }
+}

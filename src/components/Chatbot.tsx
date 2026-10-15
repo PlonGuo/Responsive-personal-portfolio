@@ -1,22 +1,28 @@
+'use client';
+
 import { useEffect, useRef, type FormEvent } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, AlertCircle, Bot } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { MessageCircle, X, Send, AlertCircle, Bot, Square } from 'lucide-react';
 import { useChatbot } from '../hooks/useChatbot';
 import { formatMessageTime } from '../utils/chatbot-helpers';
 import type { Message } from '../types/chat';
 
-// Turnstile site key
-const TURNSTILE_SITE_KEY = '0x4AAAAAACLOsmMS5bNdwcfD';
+import type { Locale } from '../../lib/i18n/locales';
+import type { Dictionary } from '../../lib/i18n/types';
+import { getErrorMessage } from '../../lib/i18n/errors';
+import TurnstileWidget from './TurnstileWidget';
+import ChatMarkdown from './ChatMarkdown';
 
 // Loading dots animation
-function LoadingDots() {
+function LoadingDots({ label }: { label: string }) {
+  const reduced = useReducedMotion();
   return (
-    <div className="flex items-center gap-1 px-4 py-3">
+    <div role="status" aria-label={label} className="flex items-center gap-1 px-4 py-3">
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
           className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full"
-          animate={{ y: [0, -6, 0] }}
+          animate={reduced ? undefined : { y: [0, -6, 0] }}
           transition={{
             duration: 0.6,
             repeat: Infinity,
@@ -29,29 +35,31 @@ function LoadingDots() {
 }
 
 // Message bubble component
-function MessageBubble({ message }: { message: Message }) {
+function MessageBubble({ message, locale }: { message: Message; locale: Locale }) {
+  const reduced = useReducedMotion();
   const isUser = message.role === 'user';
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={reduced ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}
     >
       <div
-        className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
+        className={`min-w-0 max-w-[80%] rounded-2xl px-4 py-2.5 ${
           isUser
             ? 'bg-primary text-white rounded-br-md'
             : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white rounded-bl-md'
         }`}
       >
-        <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+        {isUser ? <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+          : <ChatMarkdown content={message.content} />}
         <p
           className={`text-xs mt-1 ${
             isUser ? 'text-white/70' : 'text-slate-500 dark:text-slate-400'
           }`}
         >
-          {formatMessageTime(message.timestamp)}
+          {formatMessageTime(message.timestamp, locale === 'zh' ? 'zh-CN' : 'en-US')}
         </p>
       </div>
     </motion.div>
@@ -59,10 +67,11 @@ function MessageBubble({ message }: { message: Message }) {
 }
 
 // Welcome message
-function WelcomeMessage() {
+function WelcomeMessage({ copy }: { copy: Pick<Dictionary, 'chat'> }) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={reduced ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="text-center py-8 px-4"
     >
@@ -70,22 +79,26 @@ function WelcomeMessage() {
         <MessageCircle className="w-8 h-8 text-primary" />
       </div>
       <h3 className="font-heading text-lg font-semibold text-slate-900 dark:text-white mb-2">
-        Hi, I'm Jason! 👋
+        {copy.chat.welcome}
       </h3>
       <p className="text-sm text-slate-600 dark:text-slate-400">
-        Ask me anything about my skills, projects, or experience. I'm here to help!
+        {copy.chat.welcomeBody}
       </p>
     </motion.div>
   );
 }
 
-export default function Chatbot() {
+export default function Chatbot({ locale, siteKey, copy }: {
+  locale: Locale; siteKey: string; copy: Pick<Dictionary, 'chat' | 'a11y' | 'errors'>;
+}) {
+  const reduced = useReducedMotion();
   const {
     isOpen,
     messages,
     input,
     isLoading,
     needsVerification,
+    turnstileToken,
     error,
     inputLength,
     maxInputLength,
@@ -95,63 +108,39 @@ export default function Chatbot() {
     sendMessage,
     setTurnstileToken,
     clearError,
+    invalidateVerification,
+    abortRequest,
   } = useChatbot();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const turnstileContainerRef = useRef<HTMLDivElement>(null);
-  const turnstileWidgetIdRef = useRef<string | null>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const wasOpen = useRef(false);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
     }
-  }, [messages]);
+  }, [messages, reduced]);
 
-  // Focus input when chat opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+    if (!isOpen) {
+      if (wasOpen.current) launcherRef.current?.focus();
+      wasOpen.current = false;
+      return;
     }
+    wasOpen.current = true;
+    const timer = setTimeout(() => {
+      if (!inputRef.current?.disabled) inputRef.current?.focus();
+      else dialogRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
+    }, 0);
+    const mobile = window.matchMedia('(max-width: 767px)').matches;
+    const oldOverflow = document.body.style.overflow;
+    if (mobile) document.body.style.overflow = 'hidden';
+    return () => { clearTimeout(timer); if (mobile) document.body.style.overflow = oldOverflow; };
   }, [isOpen]);
-
-  // Initialize Turnstile when verification is needed
-  useEffect(() => {
-    if (
-      needsVerification &&
-      isOpen &&
-      window.turnstile &&
-      turnstileContainerRef.current &&
-      !turnstileWidgetIdRef.current
-    ) {
-      const isDark = document.documentElement.classList.contains('dark');
-
-      const widgetId = window.turnstile.render(turnstileContainerRef.current, {
-        sitekey: TURNSTILE_SITE_KEY,
-        callback: (token: string) => {
-          setTurnstileToken(token);
-        },
-        'expired-callback': () => {
-          setTurnstileToken(null);
-        },
-        'error-callback': () => {
-          setTurnstileToken(null);
-        },
-        theme: isDark ? 'dark' : 'light',
-        size: 'normal',
-      });
-
-      turnstileWidgetIdRef.current = widgetId;
-    }
-
-    return () => {
-      if (turnstileWidgetIdRef.current && window.turnstile) {
-        window.turnstile.remove(turnstileWidgetIdRef.current);
-        turnstileWidgetIdRef.current = null;
-      }
-    };
-  }, [needsVerification, isOpen, setTurnstileToken]);
 
   // Handle form submit
   const handleSubmit = (e: FormEvent) => {
@@ -163,9 +152,11 @@ export default function Chatbot() {
 
   // Handle input keydown (Enter to send)
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    // Candidate confirmation belongs to the input method, including its final 229 event.
+    if (e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229) return;
+    if (e.key === 'Enter') {
       e.preventDefault();
-      if (!isLoading && input.trim()) {
+      if (!e.shiftKey && !isLoading && input.trim()) {
         sendMessage();
       }
     }
@@ -191,7 +182,10 @@ export default function Chatbot() {
 
         {/* Main button */}
         <motion.button
+          ref={launcherRef}
           onClick={toggleChat}
+          tabIndex={isOpen ? -1 : 0}
+          aria-hidden={isOpen}
           className="relative w-14 h-14 rounded-full
             bg-gradient-to-br from-primary via-accent to-secondary
             text-white
@@ -199,8 +193,8 @@ export default function Chatbot() {
             animate-pulse-glow
             hover:scale-110
             transition-transform duration-200"
-          whileTap={{ scale: 0.95 }}
-          aria-label="Open chat assistant"
+          whileTap={reduced ? undefined : { scale: 0.95 }}
+          aria-label={copy.a11y.openChat}
         >
           {/* Inner glow effect */}
           <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white/20 to-transparent" />
@@ -212,7 +206,7 @@ export default function Chatbot() {
         {/* Pulsing dot indicator */}
         <motion.div
           className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-slate-900"
-          animate={{ scale: [1, 1.2, 1] }}
+          animate={reduced ? undefined : { scale: [1, 1.2, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
       </motion.div>
@@ -221,10 +215,10 @@ export default function Chatbot() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={reduced ? false : { opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
+            exit={reduced ? undefined : { opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: reduced ? 0 : 0.2 }}
             className="fixed z-50
               inset-0 md:inset-auto
               md:bottom-6 md:right-6
@@ -236,8 +230,16 @@ export default function Chatbot() {
               border-0 md:border border-slate-200 dark:border-slate-700
               shadow-2xl shadow-slate-900/10 dark:shadow-slate-900/50
               overflow-hidden"
+            ref={dialogRef}
+            onKeyDown={(event) => {
+              if (event.key !== 'Tab' || !window.matchMedia('(max-width: 767px)').matches) return;
+              const elements = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), a[href], [tabindex="0"]') ?? []);
+              const first = elements[0]; const last = elements.at(-1);
+              if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+              else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+            }}
             role="dialog"
-            aria-label="Chat with Jason's AI Assistant"
+            aria-label={copy.a11y.chatDialog}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50">
@@ -247,10 +249,10 @@ export default function Chatbot() {
                 </div>
                 <div>
                   <h2 className="font-heading font-semibold text-slate-900 dark:text-white text-sm">
-                    Jason's AI Assistant
+                    {copy.chat.title}
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Ask me anything!
+                    {copy.chat.subtitle}
                   </p>
                 </div>
               </div>
@@ -258,7 +260,7 @@ export default function Chatbot() {
                 onClick={closeChat}
                 className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700
                   flex items-center justify-center transition-colors"
-                aria-label="Close chat"
+                aria-label={copy.a11y.closeChat}
               >
                 <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
               </button>
@@ -272,10 +274,10 @@ export default function Chatbot() {
               aria-atomic="false"
             >
               {messages.length === 0 ? (
-                <WelcomeMessage />
+                <WelcomeMessage copy={copy} />
               ) : (
                 messages.map((message) => (
-                  <MessageBubble key={message.id} message={message} />
+                  <MessageBubble key={message.id} message={message} locale={locale} />
                 ))
               )}
 
@@ -283,7 +285,7 @@ export default function Chatbot() {
               {isLoading && messages[messages.length - 1]?.content === '' && (
                 <div className="flex justify-start mb-3">
                   <div className="bg-slate-100 dark:bg-slate-700 rounded-2xl rounded-bl-md">
-                    <LoadingDots />
+                    <LoadingDots label={copy.chat.thinking} />
                   </div>
                 </div>
               )}
@@ -293,20 +295,18 @@ export default function Chatbot() {
             </div>
 
             {/* Turnstile Verification */}
-            {needsVerification && (
+            {(needsVerification || turnstileToken) && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
+                initial={reduced ? false : { opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 className="px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-200 dark:border-amber-800"
               >
                 <p className="text-xs text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3" />
-                  Please verify to continue chatting
+                  {needsVerification ? copy.chat.verify : copy.chat.verified}
                 </p>
-                <div
-                  ref={turnstileContainerRef}
-                  className="flex justify-center"
-                />
+                <TurnstileWidget siteKey={siteKey} resetKey={0} action=""
+                  onToken={setTurnstileToken} onDispose={invalidateVerification} />
               </motion.div>
             )}
 
@@ -314,16 +314,17 @@ export default function Chatbot() {
             <AnimatePresence>
               {error && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
+                  initial={reduced ? false : { opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
+                  exit={reduced ? undefined : { opacity: 0, height: 0 }}
                   className="px-4 py-2 bg-red-50 dark:bg-red-900/20 border-t border-red-200 dark:border-red-800"
                 >
-                  <p className="text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
+                  <p role="alert" className="text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertCircle className="w-3 h-3 flex-shrink-0" />
-                    <span>{error}</span>
+                    <span>{getErrorMessage(error, copy)}</span>
                     <button
                       onClick={clearError}
+                      aria-label={copy.a11y.close}
                       className="ml-auto text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                     >
                       <X className="w-3 h-3" />
@@ -346,7 +347,7 @@ export default function Chatbot() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={needsVerification ? 'Complete verification first...' : 'Type your message...'}
+                    placeholder={needsVerification ? copy.chat.verifyPlaceholder : copy.chat.placeholder}
                     disabled={isLoading || needsVerification}
                     maxLength={maxInputLength}
                     className="w-full px-4 py-2.5 pr-12
@@ -357,7 +358,7 @@ export default function Chatbot() {
                       focus:outline-none focus:ring-2 focus:ring-primary/50
                       disabled:opacity-50 disabled:cursor-not-allowed
                       text-sm"
-                    aria-label="Type your message"
+                    aria-label={copy.a11y.chatInput}
                     aria-describedby="char-counter"
                   />
                   {/* Character counter */}
@@ -372,8 +373,9 @@ export default function Chatbot() {
                   )}
                 </div>
                 <button
-                  type="submit"
-                  disabled={isLoading || !input.trim() || needsVerification}
+                  type={isLoading ? 'button' : 'submit'}
+                  onClick={isLoading ? abortRequest : undefined}
+                  disabled={!isLoading && (!input.trim() || needsVerification)}
                   className="w-10 h-10 rounded-xl
                     bg-primary hover:bg-primary-dark
                     text-white
@@ -381,9 +383,9 @@ export default function Chatbot() {
                     transition-colors duration-200
                     disabled:opacity-50 disabled:cursor-not-allowed
                     disabled:hover:bg-primary"
-                  aria-label="Send message"
+                  aria-label={isLoading ? copy.a11y.stopChat : copy.a11y.sendChat}
                 >
-                  <Send className="w-4 h-4" />
+                  <>{isLoading ? <Square className="w-4 h-4" /> : <Send className="w-4 h-4" />}</>
                 </button>
               </div>
             </form>

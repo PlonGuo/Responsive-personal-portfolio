@@ -1,16 +1,24 @@
+'use client';
+
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, Clock } from 'lucide-react';
-import type { BlogPost } from '../../types/blog';
+import type { BlogPostMeta } from '../../types/blog';
+import type { Locale } from '../../../lib/i18n/locales';
+import type { Dictionary } from '../../../lib/i18n/types';
 
 interface BlogCardProps {
-  post: BlogPost;
+  post: BlogPostMeta;
+  locale: Locale;
+  copy: Pick<Dictionary, "blog">;
   index?: number;
 }
 
-export default function BlogCard({ post, index = 0 }: BlogCardProps) {
+export default function BlogCard({ post, index = 0, locale, copy }: BlogCardProps) {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
+      timeZone: 'UTC',
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -19,23 +27,25 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps) {
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 20 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
       className="group"
     >
       <Link
-        to={`/blog/${post.slug}`}
+        href={`/en/blog/${post.slug}`}
         className="block h-full bg-white dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
       >
         {/* Cover Image (if available) */}
         {post.coverImage && (
-          <div className="aspect-video rounded-xl overflow-hidden mb-4 bg-slate-100 dark:bg-slate-700">
-            <img
+          <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-slate-100 dark:bg-slate-700">
+            <Image
               src={post.coverImage}
               alt={post.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              sizes="(min-width: 928px) 388px, (min-width: 768px) calc((100vw - 152px) / 2), calc(100vw - 80px)"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
         )}
@@ -49,11 +59,12 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps) {
           {post.readTime && (
             <div className="flex items-center gap-1.5">
               <Clock className="w-4 h-4" />
-              {post.readTime} min read
+              {copy.blog.readTime.replace("{count}", String(post.readTime))}
             </div>
           )}
         </div>
 
+        {locale === 'zh' && <span className="mb-2 inline-block text-xs text-primary">{copy.blog.englishArticle}</span>}
         {/* Title */}
         <h3 className="text-lg font-heading font-semibold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors line-clamp-2">
           {post.title}

@@ -1,332 +1,100 @@
-# Jason Guo's Personal Portfolio
+# Jason Guo’s Personal Portfolio
 
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=flat&logo=vercel)](https://vercel.com)
-[![Cloudflare](https://img.shields.io/badge/Protected%20by-Cloudflare-orange?style=flat&logo=cloudflare)](https://cloudflare.com)
-[![React](https://img.shields.io/badge/React-19-blue?style=flat&logo=react)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?style=flat&logo=typescript)](https://typescriptlang.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-38B2AC?style=flat&logo=tailwind-css)](https://tailwindcss.com)
+Bilingual portfolio built with Next.js 16.4 App Router, React 19, TypeScript, Tailwind CSS 4 and Framer Motion. English articles use repository-owned MDX; the interface and portfolio content are available in English and Simplified Chinese.
 
-Modern, responsive personal portfolio website built with React 19, TypeScript, and Tailwind CSS. Features glassmorphism UI, dark mode, and comprehensive security protection.
+Production domain: [plonguo.com](https://plonguo.com). The current migration is local and awaits final review; this document does not claim it has been deployed.
 
-🌐 **Live Demo**: [plonguo.com](https://plonguo.com)
+## Local development
 
----
-
-## ✨ Features
-
-### 🎨 Design & UI
-- **Glassmorphism Aesthetic** - Modern glass-effect components
-- **Dark/Light Mode** - System preference detection with manual toggle
-- **Fully Responsive** - Mobile-first design, works on all devices
-- **Smooth Animations** - Framer Motion scroll and interaction effects
-- **Accessibility** - WCAG AA compliant with keyboard navigation
-
-### 🔒 Security & Performance
-- **Cloudflare WAF** - Web Application Firewall protection
-- **DDoS Protection** - Automatic attack mitigation
-- **Rate Limiting** - API endpoint protection
-- **Bot Defense** - Malicious bot blocking
-- **CDN** - Global content delivery via Cloudflare (200+ locations)
-- **SSL/TLS** - Full (strict) encryption end-to-end
-
-### 🛠️ Technical Stack
-- **Frontend**: React 19 with TypeScript
-- **Styling**: Tailwind CSS 4 with custom theme
-- **Build Tool**: Vite 7
-- **Animations**: Framer Motion
-- **Icons**: Lucide React + Local SVG assets
-- **Backend**: Supabase for data storage
-- **Email**: Resend for contact form
-- **Deployment**: Vercel with Cloudflare proxy
-- **Package Manager**: pnpm
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+
-- pnpm 8+
-
-### Installation
+Use Node.js 22+ and pnpm 10. Install dependencies with `pnpm install --frozen-lockfile`, configure the server environment below, then run `pnpm dev`. Open **http://localhost:3000/en** or **http://localhost:3000/zh**. If a Next dev server already owns this checkout, reuse it or stop that specific process before starting another.
 
 ```bash
-# Clone the repository
-git clone https://github.com/PlonGuo/Responsive-personal-portfolio.git
-cd Responsive-personal-portfolio
-
-# Install dependencies
-pnpm install
-
-# Start development server
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Preview production build
-pnpm preview
+pnpm dev                 # Next development server
+pnpm content:check       # Dictionaries, portfolio, MDX and font glyph/hash checks
+pnpm lint                # ESLint
+pnpm typecheck           # Next source plus server, scripts and TypeScript tests
+pnpm exec tsc --noEmit    # Root Next TypeScript configuration
+pnpm test                # Vitest unit/contract tests
+VERCEL_ENV=production pnpm build
+pnpm start               # Serve the production artifact
+PORTFOLIO_TEST_PORT=3105 VERCEL_ENV=production pnpm test:e2e
+BASE_URL=http://localhost:3105 pnpm fonts:check
 ```
 
-### Environment Variables
+Playwright starts a production Next server and an isolated HTTP streaming fixture on port 3219. Its port must be free; run suites serially. `PORTFOLIO_TEST_USE_EXISTING=1` explicitly reuses a running server, and `PORTFOLIO_TEST_BASE_URL` overrides the test origin. Install Chromium with `pnpm exec playwright install chromium` if needed. `preview` and `*:next` script aliases use the same Next commands. Vitest retains Vite internally as a test dependency; the product has no Vite entry, bundler plugin or React Router.
 
-Create a `.env.local` file in the root directory:
+## Environment
 
-```env
-# Supabase Configuration
-SUPABASE_PROJECT_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_ACCESS_TOKEN=your-access-token
-```
+Enter values in the ignored `.env.local` yourself; never commit that file or paste secrets into chat. These are server variables, not `NEXT_PUBLIC_*` variables.
 
----
+| Variable | Purpose |
+| --- | --- |
+| `SUPABASE_PROJECT_URL` | Database project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only rate limiting, token accounting and commit cache |
+| `RESEND_API_KEY` | Contact email delivery |
+| `TURNSTILE_SITE_KEY` | Public widget key, passed to the browser from the server |
+| `TURNSTILE_SECRET_KEY` | Server-only verification |
+| `DEEPSEEK_API_KEY` | Direct DeepSeek chatbot requests |
+| `DEEPSEEK_MODEL` | Optional model override; current code default is `deepseek-flash` |
+| `OPENAI_API_KEY` | Optional direct OpenAI fallback when DeepSeek cannot start a reply |
+| `OPENAI_MODEL` | Optional fallback model override; default is `gpt-4.1-mini` |
+| `GITHUB_TOKEN` | Optional authenticated public commit fetching |
+| `VERCEL_ENV` | Build-time indexing policy, described below |
 
-## 📁 Project Structure
+The `openai` package calls DeepSeek directly first, then OpenAI directly if DeepSeek fails before any reply content, returns an empty stream, or takes longer than 8 seconds to produce content. Each provider is attempted once; SDK retries are disabled. Once content starts, interruptions remain errors instead of splicing two answers. Cancellation and the route’s overall 20-second deadline stop both attempts. If DeepSeek’s key is absent, a configured OpenAI key can answer directly; if OpenAI’s key is absent, only DeepSeek is used. The OpenAI fallback uses Chat Completions (`max_completion_tokens`) and does not receive DeepSeek’s `thinking` parameter; model overrides must support these parameters. See the [OpenAI model documentation](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
 
-```
-Responsive-personal-portfolio/
-├── src/
-│   ├── components/          # React components
-│   │   ├── Header.tsx       # Navigation with dark mode
-│   │   ├── Hero.tsx         # Hero section
-│   │   ├── About.tsx        # About section
-│   │   ├── Skills.tsx       # Skills display
-│   │   ├── Qualifications.tsx # Education & Experience
-│   │   ├── Portfolio.tsx    # Project showcase
-│   │   ├── Contact.tsx      # Contact form
-│   │   └── Footer.tsx       # Footer with social links
-│   ├── data/
-│   │   └── portfolio.ts     # All content data
-│   ├── hooks/
-│   │   └── useTheme.ts      # Dark/light mode hook
-│   ├── types/
-│   │   └── index.ts         # TypeScript types
-│   ├── assets/
-│   │   └── icons/           # Local SVG icons
-│   ├── App.tsx              # Main app component
-│   ├── main.tsx             # Entry point
-│   └── index.css            # Global styles
-├── public/
-│   ├── images/              # Project screenshots
-│   └── favicon.svg          # Site favicon
-├── api/
-│   └── send-email.ts        # Serverless email function
-├── .env.local               # Environment variables (not committed)
-├── CLAUDE.md                # AI assistant context
-├── CLOUDFLARE_WAF_SETUP.md  # Security configuration guide
-├── CLOUDFLARE_DEPLOYMENT_KNOWLEDGE.md # Technical knowledge summary
-├── package.json
-├── tsconfig.json
-├── tailwind.config.ts
-└── vite.config.ts
-```
+Restart the local server after changing runtime keys. Configure the same server variables in Vercel for deployments; local `.env.local` is not uploaded. The Turnstile widget must allow the actual development hostname. Browser UI/API testing uses `pnpm dev`: production API CORS keeps its explicit production allowlist and deliberately rejects localhost. Do not weaken that policy for local QA.
 
----
+The application requires the existing Supabase tables/RPC. `supabase/migrations/` contains the contact-rate-limit migration; chat quota and GitHub cache tables are existing infrastructure, and this repository does not currently include a complete fresh-database bootstrap. Unit tests isolate database/provider failures; they do not provision a database or send mail. Contact mail is currently addressed to the portfolio owner, `jason.ghzr@gmail.com`.
 
-## 🎨 Customization
+## Routes and content
 
-### Update Content
+| Page | English | Simplified Chinese |
+| --- | --- | --- |
+| Home | `/en` | `/zh` |
+| Lab | `/en/lab` | `/zh/lab` |
+| Blog index | `/en/blog` | `/zh/blog` |
+| Article | `/en/blog/[slug]` | No translated article |
 
-Edit `src/data/portfolio.ts` to update:
-- Personal information
-- Skills list
-- Education history
-- Work experience
-- Project portfolio
-- Social links
-- Contact information
+Legacy `/`, `/lab`, `/blog` and `/blog/[slug]` use permanent redirects. Known Chinese article URLs redirect to the English article; unknown slugs and languages return 404. Query strings and the old home contact anchor remain supported. Language changes keep the current chapter, drafts, theme and chat session through client navigation.
 
-### Add New Project
+- Shared project facts, skills, links and `showActiveBadge`: `content/portfolio/shared.ts`.
+- Portfolio copy: `content/portfolio/en.ts` and `zh.ts`, matched by stable IDs.
+- Interface text and SEO copy: `lib/i18n/messages/en.json` and `zh.json`.
+- Content getters and validation: `lib/content/`; components remain in `src/components/`.
+- English articles: `content/posts/*.mdx`, listed in `content/blog-slugs.json`.
+- API routes: `app/api/{chat,send-email,github-commits}/route.ts`; business logic in `lib/api/`, shared validation in `src/api/`.
+- Persistent in-page sessions, drafts and request lifetime: `lib/client/`.
+- Fonts: `lib/fonts.ts`, `public/fonts/`, server-only OG font in `lib/assets/`.
 
-```typescript
-// src/data/portfolio.ts
-{
-  title: 'Project Name',
-  description: 'Brief description...',
-  image: '/images/project.jpg',
-  demoUrl: 'https://demo-url.com',  // optional
-  githubUrl: 'https://github.com/user/repo',  // optional
-  technologies: ['React', 'TypeScript', 'Tailwind']
-}
-```
+To add a project, add its shared metadata and the corresponding stable ID in both language copy files. `showActiveBadge` is required and all current projects set it to `false`; it controls only the badge. `demoUrl` and `githubUrl` independently control buttons. Do not infer service availability from a working URL or enable the badge without checking the service.
 
-### Add New Skill
+To add an article, create validated English MDX and update the slug manifest. Existing article metadata/body preservation is checked against `tests/fixtures/blog-baseline.json`, captured before the old TypeScript source was retired. Do not regenerate this baseline from current MDX to silence a regression; intentional editorial changes require an explicit baseline review. The old one-time migration command has been retired.
 
-```typescript
-// src/data/portfolio.ts
-{ name: 'Skill Name', icon: 'icon-name', category: 'language' | 'framework' | 'tool' | 'design' }
-```
+Resume files stay at `/Huizhirong Guo.pdf` and `/过汇智融-中文简历.pdf`; neither gets a language prefix. Both languages offer their own resume and a clearly labeled alternate download.
 
-### Design System
+## Fonts, images and design
 
-**Colors**:
-- Primary: `#3B82F6` (Blue)
-- Secondary: `#8B5CF6` (Purple)
-- Accent: `#06B6D4` (Cyan)
+Headings, body and controls use locally hosted Noto Sans SC 400/700; code uses monospace. Each cold-cache homepage has a **500 KiB** font response budget. Subset provenance, license and rebuild instructions are in [public/fonts/README.md](public/fonts/README.md). New static glyphs must pass `content:check`; unknown chat glyphs can use system fallback.
 
-**Typography**:
-- Headings: Space Grotesk
-- Body: DM Sans
+Photos and project images use `next/image` with fixed containers and responsive sizes. Lab’s first project image loads eagerly; lower-page content images remain lazy. Five large PNG sources have WebP replacements. Image compression and visual review evidence is in [PB-09A](docs/superpowers/tickets/2026-10-13-portfolio-bilingual-and-active-badge-design/PB-09A-image-optimization.md).
 
-**Components**:
-- Cards: `rounded-2xl` with glass effect
-- Buttons: `shadow-primary/25` for depth
-- Animations: Framer Motion with `whileInView`
+Keep primary `#3B82F6`, secondary `#8B5CF6`, accent `#06B6D4`, rounded cards, the class-based theme and reduced-motion support. Follow the existing keyboard/focus conventions. Accessibility and performance checks are recorded per scenario; no unmeasured Lighthouse score or blanket compliance claim is made.
 
----
+## SEO and deployment handoff
 
-## 🔧 Deployment
+Canonical, language links, Open Graph URLs, robots and sitemap use **https://plonguo.com**, including local and Preview builds. The six bilingual pages have reciprocal `en`, `zh-CN` and `x-default` links. Articles have only English metadata and their own 1200×630 share image.
 
-### Vercel Deployment
+Indexing is enabled only when **`VERCEL_ENV=production` at build time**. Preview, Development and an unset value produce `noindex, nofollow` and `Disallow: /`. Keep Vercel’s system environment variables available to the build. Changing runtime variables after building does not rewrite static metadata. Verify Preview separately with `VERCEL_ENV=preview pnpm build` and `PORTFOLIO_EXPECT_INDEXING=preview` in the SEO tests, then restore a production build.
 
-1. **Connect Repository**:
-   - Link GitHub repository to Vercel
-   - Auto-deploy on `git push`
+When deployment is explicitly authorized, select the **Next.js framework preset**, repository root `.`, build `pnpm build`, and the platform’s default output handling. Remove any old `dist` output override; this is a server-backed Next application, not a static export. Configure secrets for the intended environment before a new deployment. Upgrading an old Vercel CLI with `pnpm add -g vercel@latest` is recommended before deployment. This migration has not changed dashboard settings, pushed code or deployed.
 
-2. **Configure Project**:
-   ```
-   Root Directory: .
-   Build Command: pnpm build
-   Output Directory: dist
-   Framework: Vite
-   ```
+The production Cloudflare configuration is outside the local regression evidence. Historical infrastructure notes remain in [CLOUDFLARE_WAF_SETUP.md](CLOUDFLARE_WAF_SETUP.md) and [CLOUDFLARE_DEPLOYMENT_KNOWLEDGE.md](CLOUDFLARE_DEPLOYMENT_KNOWLEDGE.md); verify live settings before relying on them.
 
-3. **Add Environment Variables**:
-   - Add Supabase keys in Vercel dashboard
-   - Settings → Environment Variables
+## Verification and next work
 
-### Cloudflare WAF Setup
+The Chinese [verification report](docs/superpowers/reports/portfolio-bilingual-verification.md) maps AC-01–13 to commands, evidence, user review and unverified boundaries. The [approved spec](docs/superpowers/specs/2026-10-13-portfolio-bilingual-and-active-badge-design.md), [plan](docs/superpowers/plans/2026-10-13-portfolio-bilingual-and-active-badge.md) and [execution ledger](docs/superpowers/tickets/2026-10-13-portfolio-bilingual-and-active-badge-design/progress.md) are the implementation record.
 
-See [CLOUDFLARE_WAF_SETUP.md](CLOUDFLARE_WAF_SETUP.md) for detailed setup guide.
+Phase 4’s AI SDK/protocol refactor remains separate. Preserve the current SSE `{content}` / `[DONE]` contract, session lifetime, explicit cancellation and server-only keys when planning it. Do not automatically start it after migration acceptance.
 
-**Quick Summary**:
-1. Add site to Cloudflare
-2. Update nameservers at domain registrar
-3. Configure DNS: `CNAME @ cname.vercel-dns.com` (Proxied)
-4. Set SSL/TLS to **Full (strict)**
-5. Enable WAF rules and rate limiting
-
----
-
-## 📊 Performance
-
-### Lighthouse Scores
-- Performance: 98/100
-- Accessibility: 100/100
-- Best Practices: 100/100
-- SEO: 100/100
-
-### Optimizations
-- ✅ Lazy loading for images
-- ✅ Code splitting with Vite
-- ✅ Tree-shaking for minimal bundle size
-- ✅ Brotli/Gzip compression
-- ✅ HTTP/2 support
-- ✅ CDN caching (Cloudflare)
-
-### Metrics
-- **First Contentful Paint**: < 1.0s
-- **Time to Interactive**: < 2.0s
-- **Total Bundle Size**: 365 KB (gzipped: 117 KB)
-- **Global Latency**: 50ms (avg)
-
----
-
-## 🛡️ Security Features
-
-### Cloudflare Protection
-- **DDoS Mitigation** - Automatic attack defense
-- **WAF Rules** - Block SQL injection, XSS attacks
-- **Rate Limiting** - 10 requests/min per IP on API endpoints
-- **Bot Fight Mode** - Block malicious bots
-- **Geo-blocking** - Optional country restrictions
-
-### SSL/TLS
-- **Mode**: Full (strict) - End-to-end encryption
-- **Version**: TLS 1.3
-- **Certificate**: Cloudflare Universal SSL (auto-renew)
-
-### API Security
-- Request validation
-- Cloudflare header verification
-- Environment variable protection
-
----
-
-## 🧑‍💻 Development
-
-### Scripts
-
-```bash
-pnpm dev          # Start dev server (http://localhost:5173)
-pnpm build        # Build for production
-pnpm preview      # Preview production build
-pnpm lint         # Run ESLint
-```
-
-### Code Standards
-
-- **TypeScript**: Strict mode, no `any` types
-- **Components**: Functional components with hooks
-- **Styling**: Tailwind utility classes
-- **Naming**: PascalCase for components, camelCase for functions
-- **Exports**: Default export for components
-
----
-
-## 📚 Technical Knowledge
-
-This project demonstrates knowledge of:
-
-1. **Frontend Development**: React 19, TypeScript, Tailwind CSS
-2. **DNS Management**: Nameserver configuration, CNAME records
-3. **CDN Architecture**: Content delivery, edge caching
-4. **SSL/TLS**: Encryption modes, certificate management
-5. **Reverse Proxy**: Cloudflare as proxy layer
-6. **Web Security**: WAF, DDoS protection, rate limiting
-7. **HTTP Protocols**: HTTP/2, HTTPS handshake
-8. **Cloud Architecture**: Edge computing, serverless functions
-
-See [CLOUDFLARE_DEPLOYMENT_KNOWLEDGE.md](CLOUDFLARE_DEPLOYMENT_KNOWLEDGE.md) for detailed technical documentation.
-
----
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-## 👤 Author
-
-**Huizhirong (Jason) Guo**
-
-- Portfolio: [plonguo.com](https://plonguo.com)
-- GitHub: [@PlonGuo](https://github.com/PlonGuo)
-- LinkedIn: [jasonguo1104](https://linkedin.com/in/jasonguo1104)
-- Email: jason.ghzr@gmail.com
-
----
-
-## 🙏 Acknowledgments
-
-- Design inspiration: Modern glassmorphism trends
-- Icons: [Lucide](https://lucide.dev) + [Simple Icons](https://simpleicons.org)
-- Fonts: [Google Fonts](https://fonts.google.com)
-- Deployment: [Vercel](https://vercel.com)
-- Security: [Cloudflare](https://cloudflare.com)
-- Backend: [Supabase](https://supabase.com)
-
----
-
-## 📞 Support
-
-For questions or issues:
-1. Open an issue on [GitHub](https://github.com/PlonGuo/Responsive-personal-portfolio/issues)
-2. Contact via email: jason.ghzr@gmail.com
-
----
-
-**Built with ❤️ using React, TypeScript, and Tailwind CSS**
-
-*Last Updated: January 2026*
+No commit, push or deployment is authorized by running the verification commands. Stage only intentional task files when the owner later requests a commit.
