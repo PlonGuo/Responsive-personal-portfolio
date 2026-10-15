@@ -82,3 +82,5 @@ AC-13 保持未通过，等待终端网络修复后的真实接口复验；不�
 用户已确认所有验证通过并授权发布。网络恢复后重新验证：真实开发聊天200、非空SSE及DONE；邮件无效token403/VERIFICATION_FAILED；GitHub首次fresh200、随后cached:true；受控模拟DeepSeek503后，真实OpenAI200且非空。用户对真实邮件成功收件的既有确认保留，未额外向第三方发信。证据 `release-real-api.json`、`release-real-openai.json`。AC-13通过，PB-10关闭，Phase3完成；Phase4独立后做。此前失败和未授权状态均为历史记录。
 
 发布仅限当前迁移：明确路径提交、推送nextjs-migration并验证Preview，再使用Production环境重建发布；保留生产前一部署作为回退目标。Vercel项目jason-portfolio旧Other/dist改为Next.js/默认输出，build使用pnpm build；保留Node22和已有设置；仅补缺失的运行时变量，不打印秘密。
+
+2026-10-15 发布追加：f53ffec已推送迁移分支并通过Preview21项线上检查，随后main生产重建Ready。线上发现原有apex→www永久跳转与计划中的canonical不一致，用户明确选择保留www.plonguo.com主域，授权统一SEO；SITE_URL、初始HTML/分享地址、sitemap/robots测试与spec同步，域名跳转规则不改。此SEO补发仍属本次发布，不启动Phase4。发布中出现用户新修改src/assets/Huizhirong Guo.pdf，保留未提交，public简历仍为已审核版本。

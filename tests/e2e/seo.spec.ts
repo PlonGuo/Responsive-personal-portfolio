@@ -7,7 +7,7 @@ const slugs = JSON.parse(readFileSync('content/blog-slugs.json', 'utf8')) as str
 const en = JSON.parse(readFileSync('lib/i18n/messages/en.json', 'utf8')) as SEOCopy;
 const zh = JSON.parse(readFileSync('lib/i18n/messages/zh.json', 'utf8')) as SEOCopy;
 
-const origin = 'https://plonguo.com';
+const origin = 'https://www.plonguo.com';
 const indexable = process.env.PORTFOLIO_EXPECT_INDEXING !== 'preview';
 const evidence = '/tmp/portfolio-bilingual-evidence';
 mkdirSync(evidence, { recursive: true });
@@ -127,7 +127,7 @@ test('robots permits production indexing and blocks preview/development while ad
   const text = await response.text();
   writeFileSync(`${evidence}/PB-09-robots-${indexable ? 'production' : 'preview'}.txt`, text);
   expect(text).toContain('User-Agent: *');
-  expect(text).toContain('Sitemap: https://plonguo.com/sitemap.xml');
+  expect(text).toContain('Sitemap: https://www.plonguo.com/sitemap.xml');
   if (indexable) { expect(text).toContain('Allow: /'); expect(text).not.toMatch(/^Disallow: \/$/m); }
   else expect(text).toMatch(/^Disallow: \/$/m);
 });

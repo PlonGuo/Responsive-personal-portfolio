@@ -5,7 +5,7 @@ import { isLocale, locales, type Locale, type PageKind } from './i18n/locales';
 import { getPosts } from './content/posts';
 import type { BlogPost } from '../src/types/blog';
 
-export const SITE_URL = 'https://plonguo.com';
+export const SITE_URL = 'https://www.plonguo.com';
 
 export function getIndexingRobots(): Metadata['robots'] {
   const indexable = process.env.VERCEL_ENV === 'production';

@@ -141,7 +141,7 @@ Next.js App Router 使用 `app/[lang]` 表达两种语言，通过 `generateStat
 SEO（搜索引擎优化）在本次指让爬虫获取可读的对应语言内容，并准确识别正式页面与语言对应关系，不包含排名或收录时间保证。
 
 - 中英文页面在 JavaScript 执行前就提供对应语言的主体内容、HTML `lang`、标题、描述和社交分享元数据。
-- 生产正式域名使用 `https://plonguo.com`，延续原迁移计划；元数据不混入 localhost 或预览地址。
+- 生产正式域名使用 `https://www.plonguo.com`；2026-10-15 上线检查确认现有 apex→www 永久跳转，用户明确批准保留 www 主域并统一 SEO。此决定覆盖原计划不带 www 的地址；元数据不混入 localhost 或预览地址。
 - 每个正式页面声明指向自身的 canonical（正式地址声明），中文不能统一指向英文首页。
 - 真正有双语对应的页面设置双向 hreflang（语言版本关联）：`en`、`zh-CN`；默认版本 `x-default` 指向相应英文页面。
 - 英文文章提供文章自己的标题、摘要、canonical 和分享信息；不声明中文文章 hreflang。

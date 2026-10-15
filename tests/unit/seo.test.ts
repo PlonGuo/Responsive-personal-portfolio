@@ -11,7 +11,7 @@ for (const locale of locales) for (const page of ['home', 'lab', 'blog'] as cons
   test(`${locale}/${page} has its own canonical, exact copy and reciprocal languages`, () => {
     const suffix = page === 'home' ? '' : `/${page}`;
     const metadata = getPageMetadata(locale, page);
-    expect(SITE_URL).toBe('https://plonguo.com');
+    expect(metadata.metadataBase?.toString()).toBe('https://www.plonguo.com/');
     expect(metadata.title).toBe(getDictionary(locale).seo[page].title);
     expect(metadata.description).toBe(getDictionary(locale).seo[page].description);
     expect(metadata.alternates).toEqual({ canonical: `/${locale}${suffix}`, languages: {
@@ -40,6 +40,7 @@ test('sitemap exactly enumerates bilingual shells and each English article once,
   expect(entries.map(entry => entry.url).sort()).toEqual([...shells, ...posts.map(post => `${SITE_URL}/en/blog/${post.slug}`)].sort());
   expect(new Set(entries.map(entry => entry.url)).size).toBe(6 + posts.length);
   for (const entry of entries) {
+    expect(new URL(entry.url).origin).toBe('https://www.plonguo.com');
     const post = posts.find(post => entry.url === `${SITE_URL}/en/blog/${post.slug}`);
     if (post) { expect(entry.lastModified).toBe(post.date); expect(entry.alternates).toBeUndefined(); }
     else {
@@ -58,7 +59,7 @@ test.each(['production', 'preview', 'development', 'custom-staging', undefined])
   const indexable = environment === 'production';
   expect(getIndexingRobots()).toEqual({ index: indexable, follow: indexable });
   const file = getRobotsFile();
-  expect(file.sitemap).toBe('https://plonguo.com/sitemap.xml');
+  expect(file.sitemap).toBe('https://www.plonguo.com/sitemap.xml');
   expect(file.rules).toEqual(indexable ? { userAgent: '*', allow: '/', disallow: '/api/' } : { userAgent: '*', disallow: '/' });
 });
 

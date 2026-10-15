@@ -36,7 +36,7 @@ Development uses http://localhost:3000. Reuse the owner’s existing dev process
 - `content/posts/*.mdx` plus `content/blog-slugs.json`: one English article source. Known Chinese article URLs redirect; unknown slugs/languages404. `tests/fixtures/blog-baseline.json` records original metadata/body hashes; intentional editorial changes require review.
 - `lib/client/`: memory session, stream lifetime, contact draft and guarded language navigation. Do not key a whole page by locale or abort live chat on navigation.
 - `app/api/*` delegates to `lib/api/`; `src/api/` contains shared validation. Keys/admin client are server-only. The `openai` client calls DeepSeek first, with direct OpenAI fallback only before content starts (8s DeepSeek startup limit, no SDK retries). Supabase rate limiting still runs before either provider. Phase4 is a separate refactor.
-- `lib/seo.ts`: fixed production domain https://plonguo.com; only build-time VERCEL_ENV=production permits indexing. No request cookies/headers for locale.
+- `lib/seo.ts`: fixed production domain https://www.plonguo.com; only build-time VERCEL_ENV=production permits indexing. No request cookies/headers for locale.
 - `lib/fonts.ts`, `public/fonts/`: Noto Sans SC400/700, local WOFF2; per-language cold-font budget500KiB. Code monospace. Rebuild instructions/license: [font README](public/fonts/README.md). Server-only OG TTF in `lib/assets/` is not a browser preload.
 - `public/images/`: compressed photos/WebP projects with responsive Image sizes; preserve containers, cropping and animation. PDF URLs are unprefixed and selected by locale.
 - `app/globals.css`: shared design; primary#3B82F6, secondary#8B5CF6, accent#06B6D4, rounded-2xl, glass panels, class theme and reduced-motion support.

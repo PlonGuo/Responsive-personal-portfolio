@@ -2,7 +2,7 @@
 
 ## 当前发布状态（2026-10-15，覆盖下方历史状态）
 
-用户明确“都通过”，并授权提交、推送迁移分支、配置 Vercel、Preview 验证及 Production 构建发布。PB-01–10 和 DeepSeek→OpenAI 追加验收通过，Phase 3 收尾；Phase 4 未开始。TUN 恢复后复验：真实聊天200且完整DONE；无效验证码403；GitHub fresh200后缓存命中200；受控DeepSeek503后真实OpenAI200非空回复。此前网络失败记录保留为历史，不再是当前阻塞。发布执行中；部署结果以本轮交付及Vercel实际状态为准。
+用户明确“都通过”，并授权提交、推送迁移分支、配置 Vercel、Preview 验证及 Production 构建发布。PB-01–10 和 DeepSeek→OpenAI 追加验收通过，Phase 3 收尾；Phase 4 未开始。TUN 恢复后复验：真实聊天200且完整DONE；无效验证码403；GitHub fresh200后缓存命中200；受控DeepSeek503后真实OpenAI200非空回复。此前网络失败记录保留为历史，不再是当前阻塞。发布流程为迁移分支Preview验证、main的Production重建；部署状态以Vercel和发布交付为准。
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans for inline implementation, or superpowers:subagent-driven-development when the selected workflow calls for it. Execute one ticket at a time; checkbox steps track work, not approval.
 
@@ -113,3 +113,5 @@ PB-02–09 共用类型、根布局与组件，串行确认实际接口。沿用
 - [Next.js redirects](https://nextjs.org/docs/app/api-reference/config/next-config-js/redirects)：308、查询参数和固定跳转配置。
 - [React useSyncExternalStore](https://react.dev/reference/react/useSyncExternalStore)：订阅、稳定 snapshot 与 SSR snapshot。
 - [Next.js Playwright](https://nextjs.org/docs/app/guides/testing/playwright)、[MDX](https://nextjs.org/docs/app/guides/mdx)：生产服务器测试及服务端内容渲染。执行时再对照已安装版本，不从文档编写日期推定 API。
+
+2026-10-15 发布追加：f53ffec已推送迁移分支并通过Preview21项线上检查，随后main生产重建Ready。线上发现原有apex→www永久跳转与计划中的canonical不一致，用户明确选择保留www.plonguo.com主域，授权统一SEO；SITE_URL、初始HTML/分享地址、sitemap/robots测试与spec同步，域名跳转规则不改。此SEO补发仍属本次发布，不启动Phase4。发布中出现用户新修改src/assets/Huizhirong Guo.pdf，保留未提交，public简历仍为已审核版本。

@@ -2,7 +2,7 @@
 
 Bilingual portfolio built with Next.js 16.4 App Router, React 19, TypeScript, Tailwind CSS 4 and Framer Motion. English articles use repository-owned MDX; the interface and portfolio content are available in English and Simplified Chinese.
 
-Production domain: [plonguo.com](https://plonguo.com). The current migration is local and awaits final review; this document does not claim it has been deployed.
+Production domain: [www.plonguo.com](https://www.plonguo.com). Vercel builds the `main` branch for Production; migration branches receive Preview deployments. The apex domain permanently redirects to the existing `www` primary domain.
 
 ## Local development
 
@@ -83,7 +83,7 @@ Keep primary `#3B82F6`, secondary `#8B5CF6`, accent `#06B6D4`, rounded cards, th
 
 ## SEO and deployment handoff
 
-Canonical, language links, Open Graph URLs, robots and sitemap use **https://plonguo.com**, including local and Preview builds. The six bilingual pages have reciprocal `en`, `zh-CN` and `x-default` links. Articles have only English metadata and their own 1200×630 share image.
+Canonical, language links, Open Graph URLs, robots and sitemap use **https://www.plonguo.com**, including local and Preview builds. The six bilingual pages have reciprocal `en`, `zh-CN` and `x-default` links. Articles have only English metadata and their own 1200×630 share image.
 
 Indexing is enabled only when **`VERCEL_ENV=production` at build time**. Preview, Development and an unset value produce `noindex, nofollow` and `Disallow: /`. Keep Vercel’s system environment variables available to the build. Changing runtime variables after building does not rewrite static metadata. Verify Preview separately with `VERCEL_ENV=preview pnpm build` and `PORTFOLIO_EXPECT_INDEXING=preview` in the SEO tests, then restore a production build.
 

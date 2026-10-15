@@ -101,3 +101,14 @@ Minor为当前执行入口仍要求重复图片优化，已按本票文档交接
 发布准备：确认Vercel关联Huizhirong Guo’s projects/jason-portfolio，Production分支main。原framework:null（Other）、outputDirectory:dist；调整为Next.js、pnpm build、默认输出。原已有的五个服务端变量保留，仅为Preview/Production补缺失DEEPSEEK_API_KEY及TURNSTILE_SITE_KEY；凭证由本地进程stdin传递，未输出值。使用临时pnpm dlx Vercel64.2.0，不修改仓库依赖或全局CLI。旧生产deployment id与配置元数据保存至本地release-vercel-before.json，以便回退。当前部署执行中，最终URL与结果以发布交付为准。
 
 发布前最终本地检查：231/231 unit、108/108 Production浏览器、Production构建、typecheck/lint通过；证据release-{unit,production-e2e,build,typecheck,lint}.log。明确路径暂存；原已暂存图标删除与用户简历一并纳入已审核迁移，.claude仅记录已跟踪文件退役，忽略本地配置。
+
+
+## 发布及主域修正（2026-10-15）
+
+迁移提交f53ffec已推送nextjs-migration和main；Preview https://jason-portfolio-jp4666rqe-huizhirong-guos-projects.vercel.app 云端构建Ready，21项线上检查通过；Production首次重建 https://jason-portfolio-7xflpenks-huizhirong-guos-projects.vercel.app Ready，www正式站21项检查通过，应用pageerror为0。第一次Preview自动点击早于hydration，等待初始化后正常；第一次Production检测错误地假设访问apex不跳转，实际既有308指向www；纠正测试目标后通过，非语言功能失败。Cloudflare iframe内部console消息沿用已批准第三方边界；运行日志本次初扫无error记录。
+
+用户明确批准保留既有www.plonguo.com主域，统一SEO；已更新固定SITE_URL、SEO测试、README/CLAUDE/spec。不反转现有永久跳转、不改DNS或Cloudflare规则。SEO补发先RED（原metadataBase/sitemap与新主域不符），再改集中常量；无API/会话/导航改动。最新补发构建/线上结果另见release-www-*证据。
+
+上线验证包含真实聊天200+DONE、邮件无效token403、GitHub缓存命中、两语初始HTML/robots/canonical、文章/分享图/PDF/字体、375px布局及不刷新语言切换；未由自动化完成正式域名人工验证码与邮件收件。此前人工邮件收件通过不冒充本次生产成功收件。发布过程中新增的英文简历源文件修改仅保留本地，未覆盖已审核public下载文件。
+
+www主域修正验证：先12项SEO期望RED，修正后23/23SEO单测；全量231/231 unit、Production构建、类型/lint与8/8Production SEO浏览器通过。独立审查Critical/Important/Minor均0，另复验SEO+安全46/46；无需修改API白名单或域名永久跳转。证据release-www-{red,green,unit,build,typecheck,lint,seo-e2e}.log。
