@@ -34,6 +34,35 @@ let checkAbort: AbortController | undefined;
 let releaseFlightGuard: ((cancel?: boolean) => void) | undefined;
 let activeRouter: NavigationRouter | undefined;
 
+interface WarmTarget { expiresAt: number; available: boolean; check: Promise<boolean> }
+const warmTargets = new Map<string, WarmTarget>();
+
+// Public static routes can be checked while the reader is still on the source
+// page. Match Next's five-minute prefetch lifetime, without caching failures.
+export async function warmLanguageNavigation(target: string, router: NavigationRouter): Promise<boolean> {
+  const url = new URL(target, location.origin);
+  const locale = url.pathname.split('/')[1];
+  if (url.origin !== location.origin || !isLocale(locale)
+    || getLanguageTarget(new URL(location.href), locale) !== target) return false;
+  try { router.prefetch(target); } catch { /* Prefetch remains optional. */ }
+  const key = url.pathname + url.search;
+  const existing = warmTargets.get(key);
+  if (existing && existing.expiresAt > Date.now()) return existing.check;
+  const abort = new AbortController();
+  const timeout = setTimeout(() => abort.abort(), 5000);
+  const check = fetch(key, { method: 'HEAD', cache: 'no-store', signal: abort.signal })
+    .then(response => response.ok && !response.redirected)
+    .catch(() => false)
+    .finally(() => clearTimeout(timeout));
+  const warmed: WarmTarget = { expiresAt: Date.now() + 5 * 60_000, available: false, check };
+  warmTargets.set(key, warmed);
+  void check.then(available => {
+    warmed.available = available;
+    if (!available && warmTargets.get(key) === warmed) warmTargets.delete(key);
+  });
+  return check;
+}
+
 function cancelLanguageNavigation(replace = false) {
   const state = getLanguageNavigation();
   const previous = state.getSnapshot();
@@ -124,10 +153,18 @@ export async function beginLanguageNavigation(target: string, router: Navigation
   const abort = new AbortController(); checkAbort = abort;
   const timeout = setTimeout(() => abort.abort(), 5000);
   try {
-    const response = await fetch(url.pathname + url.search, { method: 'HEAD', cache: 'no-store', signal: abort.signal });
+    const key = url.pathname + url.search;
+    const warmed = warmTargets.get(key);
+    let available: boolean;
+    if (warmed && warmed.expiresAt > Date.now()) {
+      available = warmed.available || await warmed.check;
+    } else {
+      const response = await fetch(key, { method: 'HEAD', cache: 'no-store', signal: abort.signal });
+      available = response.ok && !response.redirected;
+    }
     if (attempt !== generation) return;
     if (relative() !== source) { cancelLanguageNavigation(); return; }
-    if (!response.ok || response.redirected || abort.signal.aborted) throw new Error('Destination unavailable');
+    if (!available || abort.signal.aborted) throw new Error('Destination unavailable');
     state.setState(previous => ({ ...previous, phase: 'navigating' }));
     releaseFlightGuard = guardLanguageFlight(target, () => {
       if (attempt !== generation) return;

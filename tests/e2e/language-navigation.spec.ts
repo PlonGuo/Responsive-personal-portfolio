@@ -2,6 +2,13 @@ import { expect, test } from '@playwright/test';
 import en from '../../lib/i18n/messages/en.json' with { type: 'json' };
 
 test.beforeEach(async ({ page }) => {
+  // These cases inject cold-route failures. Do not let eager prefetch satisfy
+  // the destination before the fault is installed; warm-cache success has its own suite.
+  await page.route('**/*', route => {
+    const headers = route.request().headers();
+    return headers['next-router-prefetch'] || headers['next-router-segment-prefetch']
+      ? route.abort('failed') : route.fallback();
+  });
   await page.route(/^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.simpleicons\.org|challenges\.cloudflare\.com)\//, route => route.abort());
   await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'light' });
 });
@@ -38,7 +45,6 @@ test(`a ${failure} route failure after a successful HEAD retains the page and dr
 }
 
 test('changing a blog filter cancels a delayed language preflight and uses the newer query on retry', async ({ page }) => {
-  await page.goto('/en/blog?tag=AI', { waitUntil: 'domcontentloaded' });
   let resolve!: () => void;
   const delayed = new Promise<void>(done => { resolve = done; });
   let heads = 0;
@@ -46,6 +52,7 @@ test('changing a blog filter cancels a delayed language preflight and uses the n
     if (route.request().method() === 'HEAD' && heads++ === 0) { await delayed; await route.fulfill({ status: 200 }).catch(() => {}); }
     else await route.continue();
   });
+  await page.goto('/en/blog?tag=AI', { waitUntil: 'domcontentloaded' });
   await page.locator('#language-desktop-toggle').click();
   await expect.poll(() => heads).toBe(1);
   await page.getByRole('button', { name: 'React', exact: true }).click();
@@ -138,7 +145,6 @@ test('a visited chapter stays visible without replaying its entrance when the la
 });
 
 test('failed prefetch is optional and does not prevent a normal switch', async ({ page }) => {
-  await page.goto('/en', { waitUntil: 'domcontentloaded' });
   let prefetches = 0;
   await page.route('**/zh**', route => {
     const headers = route.request().headers();
@@ -147,6 +153,7 @@ test('failed prefetch is optional and does not prevent a normal switch', async (
     }
     return route.continue();
   });
+  await page.goto('/en', { waitUntil: 'domcontentloaded' });
   await page.locator('#language-desktop-toggle').hover();
   await expect.poll(() => prefetches).toBeGreaterThan(0);
   await page.locator('#language-desktop-toggle').click();
@@ -239,10 +246,10 @@ test('768px uses the dock even though the navigation is still collapsed', async 
 });
 
 test('an unavailable HEAD retains drafts, exposes a translated error and retries', async ({ page }) => {
-  await page.goto('/en', { waitUntil: 'domcontentloaded' });
-  await page.locator('#contact input[name="subject"]').fill('Subject draft');
   let fail = true;
   await page.route('**/zh**', route => route.request().method() === 'HEAD' && fail ? route.fulfill({ status: 503 }) : route.continue());
+  await page.goto('/en', { waitUntil: 'domcontentloaded' });
+  await page.locator('#contact input[name="subject"]').fill('Subject draft');
   await page.locator('#language-desktop-toggle').click();
   await expect(page.locator('.language-notice [role="alert"]')).toHaveText(en.errors.navigation);
   await expect(page).toHaveURL(/\/en$/);

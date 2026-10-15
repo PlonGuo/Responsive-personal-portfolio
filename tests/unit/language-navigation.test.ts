@@ -62,3 +62,59 @@ test('an engine without a cancellable document fallback keeps the source and dra
   expect(r.push).not.toHaveBeenCalled(); expect(location.pathname).toBe('/en');
   expect(nav.getLanguageNavigation().getSnapshot()).toMatchObject({ pending: false, errorCode: 'navigation' });
 });
+
+test('a warmed target navigates without another network check at click time', async () => {
+  const nav = await import('../../lib/client/language-navigation');
+  const fetcher = vi.fn<typeof fetch>(async () => new Response(null, { status: 200 }));
+  vi.stubGlobal('fetch', fetcher);
+  const r = router();
+  await nav.warmLanguageNavigation('/zh', r);
+  fetcher.mockImplementation(() => new Promise(() => {}));
+  const navigation = nav.beginLanguageNavigation('/zh', r);
+  await Promise.resolve();
+  expect(r.push).toHaveBeenCalledWith('/zh', { scroll: false });
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  expect(r.prefetch).toHaveBeenCalledWith('/zh');
+  await navigation;
+});
+
+test('clicking during target warmup shares its pending check', async () => {
+  const nav = await import('../../lib/client/language-navigation');
+  let resolve!: (response: Response) => void;
+  const fetcher = vi.fn<typeof fetch>(() => new Promise(done => { resolve = done; }));
+  vi.stubGlobal('fetch', fetcher);
+  const r = router();
+  const warming = nav.warmLanguageNavigation('/zh', r);
+  const navigation = nav.beginLanguageNavigation('/zh', r);
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  resolve(new Response(null, { status: 200 }));
+  await warming; await navigation;
+  expect(r.push).toHaveBeenCalledTimes(1);
+});
+
+test('a failed background check remains retryable at click time', async () => {
+  const nav = await import('../../lib/client/language-navigation');
+  const fetcher = vi.fn<typeof fetch>().mockRejectedValueOnce(new TypeError('offline'))
+    .mockResolvedValueOnce(new Response(null, { status: 200 }));
+  vi.stubGlobal('fetch', fetcher);
+  const r = router();
+  await nav.warmLanguageNavigation('/zh', r);
+  await nav.beginLanguageNavigation('/zh', r);
+  expect(r.push).toHaveBeenCalledWith('/zh', { scroll: false });
+  expect(fetcher).toHaveBeenCalledTimes(2);
+});
+
+test('an expired warm check is refreshed rather than trusted indefinitely', async () => {
+  vi.useFakeTimers();
+  try {
+    const nav = await import('../../lib/client/language-navigation');
+    const fetcher = vi.fn<typeof fetch>(async () => new Response(null, { status: 200 }));
+    vi.stubGlobal('fetch', fetcher);
+    const r = router();
+    await nav.warmLanguageNavigation('/zh', r);
+    await vi.advanceTimersByTimeAsync(300_001);
+    await nav.beginLanguageNavigation('/zh', r);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(r.push).toHaveBeenCalledTimes(1);
+  } finally { vi.useRealTimers(); }
+});

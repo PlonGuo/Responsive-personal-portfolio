@@ -5,7 +5,7 @@ import { useState, type FocusEvent, type KeyboardEvent } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { Locale } from '../../lib/i18n/locales';
 import { getLanguageTarget } from '../../lib/i18n/routes';
-import { beginLanguageNavigation } from '../../lib/client/language-navigation';
+import { beginLanguageNavigation, warmLanguageNavigation } from '../../lib/client/language-navigation';
 import { useLanguageCopy, useLanguageNavigationState } from './LanguageNavigation';
 
 export default function LanguageSwitcher({ locale, variant = 'desktop', onSelect }: {
@@ -27,7 +27,7 @@ export default function LanguageSwitcher({ locale, variant = 'desktop', onSelect
   const prefetch = (lang: Locale) => {
     if (lang === locale) return;
     const target = getLanguageTarget(new URL(location.href), lang);
-    if (target) { try { router.prefetch(target); } catch { /* Navigation never depends on prefetch. */ } }
+    if (target) void warmLanguageNavigation(target, router);
   };
   if (variant === 'desktop') {
     const target = locale === 'en' ? 'zh' : 'en';

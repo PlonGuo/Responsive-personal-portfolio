@@ -28,7 +28,7 @@ export default async function RootLayout({ children, params }: {
   const profile = getProfile(lang);
   return (
     <html lang={htmlLang[lang]} className={`light ${sans.variable}`} suppressHydrationWarning>
-      <head><ThemeBootstrap /></head>
+      <head><ThemeBootstrap locale={lang} /></head>
       <body>
         <LanguageNavigation copy={{ actions: dict.actions, a11y: dict.a11y, errors: dict.errors, forms: dict.forms }}>
         <Header locale={lang} name={profile.shortName} copy={{ nav: dict.nav, a11y: dict.a11y }} />

@@ -73,6 +73,8 @@ To add an article, create validated English MDX and update the slug manifest. Ex
 
 Resume files stay at `/Huizhirong Guo.pdf` and `/过汇智融-中文简历.pdf`; neither gets a language prefix. Both languages offer their own resume and a clearly labeled alternate download.
 
+Downloads serve the files in `public/`. If you update an original PDF in `src/assets/`, copy it to the matching `public/` filename; the build does not sync these directories. The dev server serves the replacement immediately. Updating production requires a new deployment containing the replacement PDF; building locally alone does not publish it.
+
 ## Fonts, images and design
 
 Headings, body and controls use locally hosted Noto Sans SC 400/700; code uses monospace. Each cold-cache homepage has a **500 KiB** font response budget. Subset provenance, license and rebuild instructions are in [public/fonts/README.md](public/fonts/README.md). New static glyphs must pass `content:check`; unknown chat glyphs can use system fallback.

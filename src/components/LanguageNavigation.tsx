@@ -4,7 +4,8 @@ import { createContext, useContext, useEffect, useSyncExternalStore, type ReactN
 import { usePathname, useRouter } from 'next/navigation';
 import type { Dictionary } from '../../lib/i18n/types';
 import { beginLanguageNavigation, dismissLanguageError, getLanguageNavigation, getNavigationServerSnapshot,
-  initializeLanguageNavigation, observeLanguageNavigation } from '../../lib/client/language-navigation';
+  initializeLanguageNavigation, observeLanguageNavigation, warmLanguageNavigation } from '../../lib/client/language-navigation';
+import { getLanguageTarget } from '../../lib/i18n/routes';
 
 type Copy = Pick<Dictionary, 'actions' | 'a11y' | 'errors' | 'forms'>;
 const Context = createContext<Copy | null>(null);
@@ -24,6 +25,15 @@ export default function LanguageNavigation({ copy, children }: { copy: Copy; chi
   const router = useRouter();
   const state = useLanguageNavigationState();
   useEffect(() => { initializeLanguageNavigation(); observeLanguageNavigation(pathname); }, [pathname]);
+  useEffect(() => {
+    const warm = () => {
+      const target = getLanguageTarget(new URL(location.href), pathname.split('/')[1] === 'en' ? 'zh' : 'en');
+      if (target) void warmLanguageNavigation(target, router);
+    };
+    warm();
+    window.addEventListener('portfolio-query', warm);
+    return () => window.removeEventListener('portfolio-query', warm);
+  }, [pathname, router]);
   return <Context.Provider value={copy}>
     {children}
     {(state.pending || state.errorCode) && <div className="language-notice fixed z-[60] rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-700 shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">

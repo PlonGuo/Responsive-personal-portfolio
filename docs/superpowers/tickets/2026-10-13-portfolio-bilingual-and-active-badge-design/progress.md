@@ -1,5 +1,9 @@
 # 执行进度 — plan: docs/superpowers/plans/2026-10-13-portfolio-bilingual-and-active-badge.md
 
+## 当前本地回修（2026-10-15）
+
+[PB-10A](PB-10A-language-navigation-polish.md) 已实现且用户本地审核通过，已获本地提交授权，不推送/部署：目标语言后台预热并复用可用性检查，深色主题在绘制前恢复，用户新版英文 PDF 原样同步至 public。236 项 unit、110 项 Production 模式浏览器测试及构建/typecheck/lint 通过；线上仍为下述已发布版本，不能把本地验证写成线上优化已生效。Phase 4 未开始。
+
 ## 当前发布状态（2026-10-15，覆盖下方历史状态）
 
 用户明确“都通过”，并授权提交、推送迁移分支、配置 Vercel、Preview 验证及 Production 构建发布。PB-01–10 和 DeepSeek→OpenAI 追加验收通过，Phase 3 收尾；Phase 4 未开始。TUN 恢复后复验：真实聊天200且完整DONE；无效验证码403；GitHub fresh200后缓存命中200；受控DeepSeek503后真实OpenAI200非空回复。此前网络失败记录保留为历史，不再是当前阻塞。发布流程为迁移分支Preview验证、main的Production重建；部署状态以Vercel和发布交付为准。
