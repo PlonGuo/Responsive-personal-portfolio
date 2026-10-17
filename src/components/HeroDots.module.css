@@ -1,0 +1,13 @@
+.field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Keep the center quiet so both languages remain readable over the ring. */
+  mask-image: radial-gradient(ellipse 62% 58% at 54% 51%, #0003 0%, #0006 38%, #000 78%);
+}
+
+@media (max-width: 767px) {
+  .field {
+    mask-image: radial-gradient(ellipse 74% 52% at 50% 48%, #0002 0%, #0005 45%, #000 90%);
+  }
+}

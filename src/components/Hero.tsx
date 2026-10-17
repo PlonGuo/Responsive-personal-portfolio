@@ -6,6 +6,7 @@ import type { PortfolioProfile } from '../../lib/content/types';
 import type { SocialLink } from '../types';
 import type { Dictionary } from '../../lib/i18n/types';
 import { useTypewriter } from '../hooks/useTypewriter';
+import HeroDots from './HeroDots';
 
 
 // Bluesky icon as inline SVG since lucide doesn't have it
@@ -58,36 +59,7 @@ export default function Hero({ profile: personalInfo, lines, socialLinks, copy }
       id="home"
       className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20"
     >
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800" />
-
-      {/* Animated background shapes */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={reduced ? undefined : {
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-          className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={reduced ? undefined : {
-            scale: [1.2, 1, 1.2],
-            rotate: [90, 0, 90],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-          className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 bg-gradient-to-tr from-accent/10 to-primary/10 rounded-full blur-3xl"
-        />
-      </div>
+      <HeroDots />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex flex-col lg:flex-row items-center gap-12">
