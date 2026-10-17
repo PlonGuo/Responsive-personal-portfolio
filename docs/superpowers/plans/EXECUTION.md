@@ -1,10 +1,10 @@
 # 执行协议（每个新 session 开工前读这个）
 
-## 最新入口：Phase 4 已授权提交/推送/发布，执行中（2026-10-17）
+## 最新入口：Phase 4 已发布，线上验收通过（2026-10-17）
 
-用户已授权按[Phase4 tickets](../tickets/2026-10-15-phase4-chat-ai-sdk-design/README.md)逐票实现。P4-01及姓名回修已审核；P4-02用户已“启动”，现已实现AI SDK7服务端模型运行器、真实usage与旧SSE兼容，已获用户确认“通过”，本票关闭。287unit/34Production浏览器、构建/typecheck/lint，真实DeepSeek和OpenAI备用/用量入库比对通过；用户已授权启动并已完成P4-03：共享SDK Chat与v2协议、旧入口共用配额/模型/结算；366unit、49项唯一Production浏览器及构建/typecheck/lint通过，真实新SDK→Next→DeepSeek及1610tokens入库核对通过。用户已确认P4-03“通过，下一个”，P4-04现已实现（安全清理/cron/总验收，并补充prompt只回答本人相关问题）；368unit/114browser、content/type/lint/build、真实主备范围探针/数据库清理隔离复验/新旧HTTP通过，整分支独立review无Critical/Important/Minor。2026-10-17用户明确“通过”，P4-04及Phase 4整体关闭，不加新对话按钮；用户已明确选择“开始提交、推送和发布”，授权功能分支Preview验证后再发布Production。执行状态见[Phase4发布记录](../reports/phase4-release.md)；先提交并推送phase4-chat-ai-sdk，验证后main快进并生产构建。详情见[P4进度](../tickets/2026-10-15-phase4-chat-ai-sdk-design/progress.md)。
+用户已授权按[Phase4 tickets](../tickets/2026-10-15-phase4-chat-ai-sdk-design/README.md)逐票实现。P4-01及姓名回修已审核；P4-02用户已“启动”，现已实现AI SDK7服务端模型运行器、真实usage与旧SSE兼容，已获用户确认“通过”，本票关闭。287unit/34Production浏览器、构建/typecheck/lint，真实DeepSeek和OpenAI备用/用量入库比对通过；用户已授权启动并已完成P4-03：共享SDK Chat与v2协议、旧入口共用配额/模型/结算；366unit、49项唯一Production浏览器及构建/typecheck/lint通过，真实新SDK→Next→DeepSeek及1610tokens入库核对通过。用户已确认P4-03“通过，下一个”，P4-04现已实现（安全清理/cron/总验收，并补充prompt只回答本人相关问题）；368unit/114browser、content/type/lint/build、真实主备范围探针/数据库清理隔离复验/新旧HTTP通过，整分支独立review无Critical/Important/Minor。2026-10-17用户明确“通过”，P4-04及Phase 4整体关闭，不加新对话按钮；用户已明确选择“开始提交、推送和发布”，授权功能分支Preview验证后再发布Production。已完成phase4-chat-ai-sdk的Preview验证及main快进后的Production发布，结果见[Phase4发布记录](../reports/phase4-release.md)。详情见[P4进度](../tickets/2026-10-15-phase4-chat-ai-sdk-design/progress.md)。
 
-当前 main 本地 c541a75（PB-10A 语言切换与英文 PDF 已审核并本地提交，未推送），线上仍为 8a7ebfb。下方 Phase 3 与旧执行模板仅作历史记录。
+发布结果：应用提交`f089bb9`包含PB-10A语言切换/英文PDF与P4-01–04，已推送功能分支并通过Preview后快进main发布。Production READY，www线上25项冒烟、17项SEO检查通过，正确姓名/无关拒答/网页原生SDK聊天及两份PDF文件一致性均通过。本文及进度入口在仅文档跟进提交中归档，详情与验证边界见[发布记录](../reports/phase4-release.md)。无剩余实现票据，不自动创建下一Phase。下方 Phase 3 与旧执行模板仅作历史记录。
 
 ## 当前发布状态（2026-10-15，覆盖下方历史状态）
 

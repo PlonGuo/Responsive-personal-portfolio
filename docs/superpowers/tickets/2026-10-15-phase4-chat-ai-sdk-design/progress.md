@@ -114,3 +114,9 @@ P4-03文档检查补记：spec/tickets/执行入口本地链接通过；README�
 ## 发布授权（2026-10-17）
 
 用户明确选择“开始提交、推送和发布”，授权提交Phase4并推送功能分支生成Preview，验证后再发布Production。此前“不自动提交/发布”的限制仍适用于未经新指令的其他工作；本次发布已明确获授权。后续结果见[发布记录](../../reports/phase4-release.md)。
+
+## 发布完成（2026-10-17）
+
+- 应用提交`f089bb9`已推送`phase4-chat-ai-sdk`，Preview READY且24项冒烟/17项SEO通过；main快进至同一提交后已推送，Production独立构建READY并绑定www主域。
+- www线上25项冒烟、17项SEO通过，页面脚本异常0：原生SDK聊天/正确中文姓名/无关拒答、深色主题同document切语言、375px对话框、两份PDF与本地哈希一致；新旧API正常，恶意Origin与无效验证码均403，GitHub缓存正常。apex→www仍308。合并后368unit再验通过。
+- Preview验证码域名限制与生产Cloudflare iframe提示保留为第三方边界；未重复发送真实邮件或在生产强制触发备用模型，未重跑数据库迁移、修改密钥或安全配置。发布结果在仅文档跟进提交中归档，详细部署ID/证据见[发布记录](../../reports/phase4-release.md)。Phase 4无剩余票据，不自动开始新Phase。
