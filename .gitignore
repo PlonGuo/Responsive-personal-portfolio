@@ -28,6 +28,9 @@ dist-ssr
 # Local Claude Code configuration and skills
 /.claude/
 
+# Local reusable skills
+/skills/
+
 # Next.js and browser verification output
 .next/
 next-env.d.ts
