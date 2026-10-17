@@ -126,14 +126,14 @@ export default function LabView({ projectsByYear: groups, locale, copy }: {
                       className="group relative"
                     >
                       <div
-                        className={`bg-slate-900/80 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/50 ${
+                        className={`flex h-full flex-col bg-slate-900/80 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/50 ${
                           hoveredProject === project.id
                             ? 'lab-glow-border transform scale-[1.02]'
                             : ''
                         }`}
                       >
                         {/* Project Image */}
-                        <div className="relative aspect-video overflow-hidden">
+                        <div className="relative aspect-video shrink-0 overflow-hidden">
                           <Image
                             src={project.image}
                             alt={project.title}
@@ -149,7 +149,7 @@ export default function LabView({ projectsByYear: groups, locale, copy }: {
                         </div>
 
                         {/* Content */}
-                        <div className="p-6">
+                        <div className="flex flex-1 flex-col p-6">
                           <h3 className="text-xl font-heading font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
                             {project.title}
                           </h3>
@@ -179,7 +179,7 @@ export default function LabView({ projectsByYear: groups, locale, copy }: {
                           </div>
 
                           {/* Links */}
-                          <div className="flex gap-3">
+                          <div className="mt-auto flex gap-3">
                             {project.githubUrl && (
                               <a
                                 href={project.githubUrl}
