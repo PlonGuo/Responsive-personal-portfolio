@@ -4,7 +4,7 @@ const fixture = 'http://127.0.0.1:3219';
 
 test('mounted widgets do not issue chat, email or updates requests before interaction', async ({ page }) => {
   const requests: string[] = [];
-  page.on('request', request => { if (/\/api\/(chat|send-email|github-commits)$/.test(request.url())) requests.push(request.url()); });
+  page.on('request', request => { if (/\/api\/(chat(?:\/v2)?|send-email|github-commits)$/.test(request.url())) requests.push(request.url()); });
   await page.goto('/zh');
   await expect(page.getByRole('button', { name: zh.a11y.openChat })).toBeVisible();
   await expect(page.getByRole('button', { name: zh.a11y.updates })).toBeVisible();
@@ -13,7 +13,7 @@ test('mounted widgets do not issue chat, email or updates requests before intera
 
 test('delayed real HTTP SSE, drafts and theme survive navigation away from home', async ({ page, request }) => {
   await request.post(fixture + '/reset');
-  await page.route('**/api/chat', route => route.continue({ url: fixture + '/api/chat' }));
+  await page.route('**/api/chat/v2', route => route.continue({ url: fixture + '/api/chat/v2' }));
   await page.goto('/zh');
   await page.locator('#contact').getByRole('textbox', { name: zh.forms.name, exact: true }).fill('Jason draft');
   await page.locator('#contact').getByRole('textbox', { name: zh.forms.message, exact: true }).fill('contact message draft');
@@ -47,7 +47,7 @@ test('delayed real HTTP SSE, drafts and theme survive navigation away from home'
 
 test('explicit stop cancels the fixture connection and unlocks the input', async ({ page, request }) => {
   await request.post(fixture + '/reset');
-  await page.route('**/api/chat', route => route.continue({ url: fixture + '/api/chat' }));
+  await page.route('**/api/chat/v2', route => route.continue({ url: fixture + '/api/chat/v2' }));
   await page.goto('/en');
   await page.getByRole('button', { name: 'Open chat assistant' }).click();
   await page.getByRole('textbox', { name: 'Type your message', exact: true }).fill('stop test');

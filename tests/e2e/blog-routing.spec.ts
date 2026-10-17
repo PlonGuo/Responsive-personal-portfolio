@@ -82,7 +82,7 @@ test('the legacy homepage redirect keeps the contact fragment in the browser', a
 test('an in-flight HTTP reply and contact draft survive reading an article and opening the Chinese index', async ({ page, request }) => {
   const fixture = 'http://127.0.0.1:3219';
   await request.post(fixture + '/reset');
-  await page.route('**/api/chat', route => route.continue({ url: fixture + '/api/chat' }));
+  await page.route('**/api/chat/v2', route => route.continue({ url: fixture + '/api/chat/v2' }));
   await page.goto('/en', { waitUntil: 'domcontentloaded' });
   await page.locator('#contact input[name="name"]').fill('Article navigation draft');
   await page.getByRole('button', { name: en.a11y.openChat }).click();

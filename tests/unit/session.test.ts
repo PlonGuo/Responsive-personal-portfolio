@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { createStore } from '../../lib/client/store';
 import { createSessionState, getBrowserSession, getServerSnapshot } from '../../lib/client/session';
+import { getChatInstance } from '../../lib/client/chat-instance';
 
 test('detaching a subscriber preserves drafts, history, ID and later updates', () => {
   const store = createStore(createSessionState('same-id'));
@@ -16,7 +17,10 @@ test('detaching a subscriber preserves drafts, history, ID and later updates', (
 test('server snapshots are stable, empty and never create a visitor singleton', () => {
   expect(getServerSnapshot()).toBe(getServerSnapshot());
   expect(getServerSnapshot().chat.sessionId).toBe('');
-  expect(getServerSnapshot().chat.messages).toEqual([]);
+  expect(getServerSnapshot().chat).not.toHaveProperty('messages');
+  expect(getServerSnapshot().chat).not.toHaveProperty('isLoading');
+  expect(getServerSnapshot().chat).not.toHaveProperty('error');
   expect(() => getBrowserSession()).toThrow();
-  expect(createSessionState('first').chat.messages).not.toBe(createSessionState('second').chat.messages);
+  expect(() => getChatInstance()).toThrow('browser-only');
+  expect(createSessionState('first').chat).not.toBe(createSessionState('second').chat);
 });

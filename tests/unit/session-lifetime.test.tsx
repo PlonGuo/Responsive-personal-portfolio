@@ -5,6 +5,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { useChatbot } from '../../src/hooks/useChatbot';
 import { useContactDraft } from '../../src/hooks/useContactDraft';
 import { createSessionState, getBrowserSession } from '../../lib/client/session';
+import { uiStart, uiDelta, uiFinish, uiEvents } from '../helpers/ui-stream';
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 function ChatView() {
@@ -25,12 +26,12 @@ test('actual hook unmount/remount keeps the request, transcript and stable ID', 
   const first = render(<ChatView />);
   fireEvent.change(screen.getByLabelText('chat draft'), { target: { value: 'question' } });
   fireEvent.click(screen.getByText('send'));
-  await act(async () => { writer.enqueue(new TextEncoder().encode('data: {"content":"first"}\n\n')); });
+  await act(async () => { writer.enqueue(new TextEncoder().encode(uiEvents([...uiStart, uiDelta('first')]))); });
   expect(screen.getByText('first')).toBeTruthy();
   first.unmount();
   expect(fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(false);
   await act(async () => {
-    writer.enqueue(new TextEncoder().encode('data: {"content":" second"}\n\ndata: [DONE]\n\n')); writer.close();
+    writer.enqueue(new TextEncoder().encode(uiEvents([uiDelta(' second'), ...uiFinish]))); writer.close();
   });
   render(<ChatView />);
   expect(screen.getByText('first second')).toBeTruthy();

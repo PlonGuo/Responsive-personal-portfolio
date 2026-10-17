@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { uiReply } from '../helpers/ui-stream';
 
 test.beforeEach(async ({ page }) => {
   // These layout tests exercise local UI, not external font/icon/CDN availability.
@@ -10,9 +11,9 @@ test('assistant Markdown renders in the real mobile chat without changing the us
   await page.setViewportSize({ width: 375, height: 900 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const content = '8. **技术栈与方向**：Python、TypeScript/JavaScript。\n\n```ts\nconst example = "a deliberately long line that should scroll inside the code block";\n```\n\n| 技术 | 用途 |\n| --- | --- |\n| Python | Agent |';
-  await page.route('**/api/chat', route => route.fulfill({
+  await page.route('**/api/chat/v2', route => route.fulfill({
     contentType: 'text/event-stream',
-    body: `data: ${JSON.stringify({ content })}\n\ndata: [DONE]\n\n`,
+    body: uiReply(content),
   }));
   await page.goto('/zh', { waitUntil: 'domcontentloaded' });
   await page.getByRole('button', { name: '打开聊天助手' }).click();

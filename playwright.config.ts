@@ -14,7 +14,7 @@ export default defineConfig({
     reuseExistingServer: process.env.PORTFOLIO_TEST_USE_EXISTING === '1',
     timeout: 30_000,
   }, {
-    command: 'node tests/fixtures/chat-stream-server.mjs',
+    command: 'node --import tsx tests/fixtures/chat-stream-server.mjs',
     env: { FIXTURE_ALLOWED_ORIGIN: baseURL },
     url: 'http://127.0.0.1:3219/health',
     reuseExistingServer: false,

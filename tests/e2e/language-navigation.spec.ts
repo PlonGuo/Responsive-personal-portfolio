@@ -263,7 +263,7 @@ test('an unavailable HEAD retains drafts, exposes a translated error and retries
 test('a delayed HTTP stream, theme and drafts survive actual language switches with a stable session', async ({ page, request }) => {
   const fixture = 'http://127.0.0.1:3219';
   await request.post(fixture + '/reset');
-  await page.route('**/api/chat', route => route.continue({ url: fixture + '/api/chat' }));
+  await page.route('**/api/chat/v2', route => route.continue({ url: fixture + '/api/chat/v2' }));
   await page.goto('/en', { waitUntil: 'domcontentloaded' });
   await page.locator('#contact input[name="name"]').fill('Contact draft');
   await page.getByRole('button', { name: en.a11y.darkTheme }).first().click();

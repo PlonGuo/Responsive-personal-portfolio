@@ -282,7 +282,7 @@ export default function Chatbot({ locale, siteKey, copy }: {
               )}
 
               {/* Loading indicator */}
-              {isLoading && messages[messages.length - 1]?.content === '' && (
+              {isLoading && (messages.at(-1)?.role !== 'assistant' || messages.at(-1)?.content === '') && (
                 <div className="flex justify-start mb-3">
                   <div className="bg-slate-100 dark:bg-slate-700 rounded-2xl rounded-bl-md">
                     <LoadingDots label={copy.chat.thinking} />

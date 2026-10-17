@@ -9,6 +9,7 @@ test('ordinary API calls are untouched and a successful route retains its Respon
   const fetcher = vi.fn<typeof fetch>(async () => response); vi.stubGlobal('fetch', fetcher);
   const failed = vi.fn(); const release = guardLanguageFlight('/zh', failed);
   expect(await fetch('/api/chat', { method: 'POST' })).toBe(response);
+  expect(await fetch('/api/chat/v2', { method: 'POST' })).toBe(response);
   expect(await fetch('/zh?_rsc=test', { headers: { RSC: '1' } })).toBe(response);
   expect(failed).not.toHaveBeenCalled();
   release(); expect(window.fetch).toBe(fetcher);

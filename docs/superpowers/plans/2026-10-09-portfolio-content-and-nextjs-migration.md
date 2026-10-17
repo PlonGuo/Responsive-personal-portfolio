@@ -2691,6 +2691,8 @@ git commit -m "perf: compress images, use next/image, eliminate theme flash"
 
 ## Phase 4：聊天助手重构（Vercel AI SDK + DeepSeek）
 
+> 2026-10-15：用户已启动本阶段并要求按[修订spec](../specs/2026-10-15-phase4-chat-ai-sdk-design.md)编写tickets。[匹配的逐票计划](../tickets/2026-10-15-phase4-chat-ai-sdk-design/README.md)已编写，待审核后逐张实施；下方Task17–18为历史设计，不直接照抄。不得按旧示例重配已有密钥、使用git add -A或自动提交/部署。
+
 **前置条件**：用户提供 DeepSeek API key。**在拿到 key 之前不要开始本阶段。**
 
 **为什么换 AI SDK**：现在前后端各手写约 100 行 SSE 解析；`streamText()` + `useChat()` 把这两段全删掉，换模型从"改三个地方"变成"改一行 provider"。

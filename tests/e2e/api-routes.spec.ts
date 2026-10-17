@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-for (const path of ['send-email', 'chat', 'github-commits']) {
+for (const path of ['send-email', 'chat', 'chat/v2', 'github-commits']) {
   test(`${path} rejects a malicious Origin including on OPTIONS`, async ({ request }) => {
     for (const method of ['OPTIONS', path === 'github-commits' ? 'GET' : 'POST']) {
       const response = await request.fetch(`/api/${path}`, {
@@ -19,7 +19,7 @@ for (const path of ['send-email', 'chat', 'github-commits']) {
 }
 
 test('write endpoints reject unsupported methods, malformed JSON and missing verification without side effects', async ({ request }) => {
-  for (const path of ['send-email', 'chat']) {
+  for (const path of ['send-email', 'chat', 'chat/v2']) {
     expect((await request.get(`/api/${path}`)).status()).toBe(405);
     const malformed = await request.post(`/api/${path}`, {
       headers: { Origin: 'https://plonguo.com', 'Content-Type': 'application/json' }, data: '{',

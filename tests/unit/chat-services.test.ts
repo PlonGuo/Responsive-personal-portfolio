@@ -2,271 +2,91 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 vi.mock('server-only', () => ({}));
 import { chatServices } from '../../lib/api/chat-services';
 import { createChatRoute } from '../../lib/api/chat-route';
-
-const body = { message: '<hello>', sessionId: 'test-session', history: [] };
-const encoder = new TextEncoder();
-const event = (content: string) => `data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\n`;
-const reply = (content = 'reply') => new Response(`${event(content)}data: [DONE]\n\n`, {
-  headers: { 'Content-Type': 'text/event-stream' },
-});
-const failure = (status = 503) => new Response(JSON.stringify({ error: { message: 'private provider error' } }), {
-  status, headers: { 'Content-Type': 'application/json' },
-});
-async function collect(signal = new AbortController().signal) {
-  const chunks: string[] = [];
-  for await (const chunk of await chatServices.stream(body, signal)) chunks.push(chunk);
-  return chunks;
-}
-interface ProviderRequest { url: string; authorization: string | null; body: Record<string, unknown>; signal: AbortSignal }
-function transport(respond: (request: ProviderRequest, index: number) => Response | Promise<Response>) {
-  const requests: ProviderRequest[] = [];
-  vi.stubGlobal('fetch', async (url: unknown, options: RequestInit) => {
-    const request = { url: String(url), authorization: new Headers(options.headers).get('authorization'),
-      body: JSON.parse(String(options.body)), signal: options.signal! };
-    requests.push(request);
-    return respond(request, requests.length - 1);
-  });
-  return requests;
-}
-function stalled(request: ProviderRequest) {
-  return new Promise<Response>((_resolve, reject) => {
-    request.signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
-  });
-}
+import { collect, transport, reply, failure } from '../helpers/model-transport';
+const input = { message: "What's React/Vue？<中文>", sessionId: 'test-session', history: [] };
 beforeEach(() => {
-  vi.stubEnv('DEEPSEEK_API_KEY', 'deepseek-test-key');
-  vi.stubEnv('OPENAI_API_KEY', 'openai-test-key');
-  vi.stubEnv('DEEPSEEK_MODEL', '');
-  vi.stubEnv('OPENAI_MODEL', '');
+  vi.stubEnv('DEEPSEEK_API_KEY', 'deepseek-test-key'); vi.stubEnv('OPENAI_API_KEY', 'openai-test-key');
+  vi.stubEnv('DEEPSEEK_MODEL', ''); vi.stubEnv('OPENAI_MODEL', '');
 });
-afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
+afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
+const makeRequest = () => new Request('https://plonguo.com/api/chat', { method: 'POST',
+  headers: { Origin: 'https://plonguo.com', 'Content-Type': 'application/json' }, body: JSON.stringify(input) });
+const admission = async (ipKey: string, requestId: string) => ({ status: 'allowed' as const,
+  permit: { ipKey, requestId, windowId: '22222222-2222-4222-8222-222222222222' } });
 
-test('DeepSeek success sends sanitized history directly and never calls OpenAI', async () => {
-  const requests = transport(() => reply());
-  const history = [{ role: 'assistant' as const, content: 'older reply', name: 'untrusted-name', tool_calls: [] }];
-  const source = await chatServices.stream({ ...body, history }, new AbortController().signal);
-  const chunks: string[] = [];
-  for await (const chunk of source) chunks.push(chunk);
-  expect(chunks).toEqual(['reply']);
-  expect(requests).toHaveLength(1);
-  expect(requests[0]).toMatchObject({ url: 'https://api.deepseek.com/chat/completions', authorization: 'Bearer deepseek-test-key',
-    body: { model: 'deepseek-flash', thinking: { type: 'disabled' }, stream: true } });
-  expect((requests[0].body.messages as unknown[]).slice(1)).toEqual([
-    { role: 'assistant', content: 'older reply' }, { role: 'user', content: '&lt;hello&gt;' },
-  ]);
+test.each(['deepseek', 'fallback'] as const)('the %s production service receives verified Chinese identity and strips extra history fields', async mode => {
+  const { fetcher, requests } = transport((_request, i) => mode === 'fallback' && !i ? failure() : reply());
+  vi.stubGlobal('fetch', fetcher);
+  const history = [{ role: 'assistant' as const, content: '我叫郭汇智。', name: 'untrusted', tool_calls: [] }];
+  const run = await chatServices.start({ ...input, history }, new AbortController().signal);
+  expect(await collect(run.text)).toBe('reply');
+  for (const request of requests) {
+    const messages = request.body.messages as { role: string; content: string }[];
+    expect(messages[0]).toMatchObject({ role: 'system', content: expect.stringContaining('Chinese full name: 过汇智融') });
+    expect(messages[0].content).toContain('Chinese surname: 过; given name: 汇智融');
+    expect(messages[1]).toMatchObject({ role: 'assistant', content: '我叫郭汇智。' });
+    expect(messages[1]).not.toHaveProperty('name');
+    expect(messages[1]).not.toHaveProperty('tool_calls');
+    expect(messages.at(-1)).toEqual({ role: 'user', content: "What's React/Vue？<中文>" });
+  }
 });
-
-test('a configured DeepSeek model reaches the provider', async () => {
-  vi.stubEnv('DEEPSEEK_MODEL', 'deepseek-v4-pro');
-  const requests = transport(() => reply());
-  expect(await collect()).toEqual(['reply']);
-  expect(requests[0].body.model).toBe('deepseek-v4-pro');
-});
-
-test.each([401, 429, 503])('DeepSeek HTTP %s falls back once with isolated OpenAI credentials and parameters', async status => {
-  vi.stubEnv('OPENAI_BASE_URL', 'https://untrusted.example/v1');
-  const requests = transport((_request, index) => index === 0 ? failure(status) : reply('OpenAI reply'));
-  expect(await collect()).toEqual(['OpenAI reply']);
-  expect(requests).toHaveLength(2);
-  expect(requests[1]).toMatchObject({ url: 'https://api.openai.com/v1/chat/completions', authorization: 'Bearer openai-test-key',
-    body: { model: 'gpt-4.1-mini', max_completion_tokens: 1024, stream: true } });
-  expect(requests[1].body).not.toHaveProperty('thinking');
-  expect(requests[1].body).not.toHaveProperty('max_tokens');
-  expect(requests[1].body.messages).toEqual(requests[0].body.messages);
-});
-
-test('connection failure falls back without retrying DeepSeek', async () => {
-  const requests = transport((_request, index) => {
-    if (index === 0) throw new TypeError('connection reset');
-    return reply('backup');
-  });
-  expect(await collect()).toEqual(['backup']);
+test('successful fallback preserves old SSE and settles both attempts with the real known total', async () => {
+  const { fetcher, requests } = transport((_request, i) => i ? reply('backup') : reply(''));
+  vi.stubGlobal('fetch', fetcher);
+  const settle = vi.fn(async () => {});
+  const handle = createChatRoute({ ...chatServices, admit: admission, settle });
+  const response = await handle(makeRequest());
+  expect(response.status).toBe(200);
+  expect(await response.text()).toBe('data: {"content":"backup"}\n\ndata: [DONE]\n\n');
+  expect(settle).toHaveBeenCalledWith(expect.any(Object), { attempts: [
+    { provider: 'deepseek', inputTokens: 23, outputTokens: 7, totalTokens: 30 },
+    { provider: 'openai', inputTokens: 23, outputTokens: 7, totalTokens: 30 },
+  ], termination: 'complete' });
   expect(requests).toHaveLength(2);
 });
-
-test('missing DeepSeek key uses the configured OpenAI model directly', async () => {
-  vi.stubEnv('DEEPSEEK_API_KEY', '');
-  vi.stubEnv('OPENAI_MODEL', ' gpt-4.1 ');
-  const requests = transport(() => reply('backup'));
-  expect(await collect()).toEqual(['backup']);
-  expect(requests).toHaveLength(1);
-  expect(requests[0]).toMatchObject({ authorization: 'Bearer openai-test-key', body: { model: 'gpt-4.1' } });
-});
-
-test('no configured keys fails without issuing a network request', async () => {
-  vi.stubEnv('DEEPSEEK_API_KEY', ''); vi.stubEnv('OPENAI_API_KEY', '');
-  const requests = transport(() => reply());
-  await expect(collect()).rejects.toThrow('Chat service unavailable');
-  expect(requests).toHaveLength(0);
-});
-
-test('DeepSeek remains usable without a fallback key', async () => {
-  vi.stubEnv('OPENAI_API_KEY', '');
-  const requests = transport(() => reply());
-  expect(await collect()).toEqual(['reply']);
-  expect(requests).toHaveLength(1);
-});
-
-test('primary failure without a fallback key fails safely with no extra request', async () => {
-  vi.stubEnv('OPENAI_API_KEY', '');
-  const requests = transport(() => failure());
-  await expect(collect()).rejects.toThrow('Chat service unavailable');
-  expect(requests).toHaveLength(1);
-});
-
-test.each(['empty', 'stream-error'])('DeepSeek %s before content falls back', async mode => {
-  const requests = transport((_request, index) => index ? reply('backup') : new Response(
-    mode === 'empty' ? 'data: [DONE]\n\n' : 'data: {"error":{"message":"upstream failed"}}\n\n',
-    { headers: { 'Content-Type': 'text/event-stream' } },
-  ));
-  expect(await collect()).toEqual(['backup']);
-  expect(requests).toHaveLength(2);
-});
-
-test('both providers failing returns one generic API failure with no repeated attempts', async () => {
-  const requests = transport(() => failure());
-  const account = vi.fn(async () => {});
-  const handle = createChatRoute({ ...chatServices, limit: async () => 'allowed', account });
-  const response = await handle(new Request('https://plonguo.com/api/chat', { method: 'POST',
-    headers: { Origin: 'https://plonguo.com', 'Content-Type': 'application/json' }, body: JSON.stringify(body) }));
+test('both providers failing still settles startup attempts with no private error response', async () => {
+  const { fetcher, requests } = transport(() => failure()); vi.stubGlobal('fetch', fetcher);
+  const settle = vi.fn(async () => {});
+  const response = await createChatRoute({ ...chatServices, admit: admission, settle })(makeRequest());
   expect(response.status).toBe(500);
   expect(await response.json()).toEqual({ code: 'SERVER_ERROR', error: 'Something went wrong. Please try again.' });
   expect(requests).toHaveLength(2);
-  expect(account).not.toHaveBeenCalled();
+  expect(settle).toHaveBeenCalledWith(expect.any(Object), { attempts: [
+    { provider: 'deepseek', inputTokens: null, outputTokens: null, totalTokens: null },
+    { provider: 'openai', inputTokens: null, outputTokens: null, totalTokens: null },
+  ], termination: 'error' });
+});
+test('quota outage blocks both real SDK provider transports', async () => {
+  const { fetcher, requests } = transport(() => reply()); vi.stubGlobal('fetch', fetcher);
+  const handle = createChatRoute({ ...chatServices, admit: async () => ({ status: 'unavailable' }) });
+  expect((await handle(makeRequest())).status).toBe(503); expect(requests).toHaveLength(0);
 });
 
-test('failure after emitted content never splices in a second provider', async () => {
-  const requests = transport(() => new Response(`${event('partial')}data: {"error":{"message":"lost connection"}}\n\n`,
-    { headers: { 'Content-Type': 'text/event-stream' } }));
-  const chunks: string[] = [];
-  await expect((async () => { for await (const chunk of await chatServices.stream(body, new AbortController().signal)) chunks.push(chunk); })())
-    .rejects.toThrow();
-  expect(chunks).toEqual(['partial']);
-  expect(requests).toHaveLength(1);
+test('route cancellation after fallback text settles once, cancels upstream and retains known primary usage', async () => {
+  const { encoder, chunk } = await import('../helpers/model-transport');
+  const { fetcher, requests } = transport((r, i) => i ? new Response(new ReadableStream({ start(c) {
+    c.enqueue(encoder.encode(chunk('backup partial')));
+    r.signal.addEventListener('abort', () => { try { c.error(r.signal.reason); } catch { /* Stream already closed. */ } }, { once: true });
+  } }), { headers: { 'Content-Type': 'text/event-stream' } }) : reply(''));
+  vi.stubGlobal('fetch', fetcher);
+  const settle = vi.fn(async () => {});
+  const reader = (await createChatRoute({ ...chatServices, admit: admission, settle })(makeRequest())).body!.getReader();
+  expect(new TextDecoder().decode((await reader.read()).value)).toContain('backup partial');
+  await reader.cancel();
+  expect(settle).toHaveBeenCalledTimes(1);
+  expect(settle).toHaveBeenCalledWith(expect.any(Object), { attempts: [
+    { provider: 'deepseek', inputTokens: 23, outputTokens: 7, totalTokens: 30 },
+    { provider: 'openai', inputTokens: null, outputTokens: null, totalTokens: null },
+  ], termination: 'aborted' });
+  expect(requests[1].signal.aborted).toBe(true); expect(requests).toHaveLength(2);
 });
-
-test.each(['headers', 'first-content'])('DeepSeek stalled at %s is aborted after 8 seconds and OpenAI takes over', async stage => {
-  vi.useFakeTimers();
-  const requests = transport((request, index) => {
-    if (index) return reply('backup');
-    if (stage === 'headers') return stalled(request);
-    return new Response(new ReadableStream({ start(controller) {
-      controller.enqueue(encoder.encode(event('')));
-      request.signal.addEventListener('abort', () => controller.error(new DOMException('Aborted', 'AbortError')), { once: true });
-    } }), { headers: { 'Content-Type': 'text/event-stream' } });
-  });
-  const result = collect();
-  await vi.advanceTimersByTimeAsync(7999);
-  expect(requests).toHaveLength(1);
-  await vi.advanceTimersByTimeAsync(1);
-  expect(await result).toEqual(['backup']);
-  expect(requests).toHaveLength(2);
-  expect(requests[0].signal.aborted).toBe(true);
-});
-
-test('primary startup timer stops after first content so long replies continue', async () => {
-  vi.useFakeTimers();
-  let controller!: ReadableStreamDefaultController<Uint8Array>;
-  const requests = transport(request => new Response(new ReadableStream({ start(next) {
-    controller = next; next.enqueue(encoder.encode(event('first')));
-    request.signal.addEventListener('abort', () => next.error(new DOMException('Aborted', 'AbortError')), { once: true });
-  } }), { headers: { 'Content-Type': 'text/event-stream' } }));
-  const source = await chatServices.stream(body, new AbortController().signal);
-  const iterator = source[Symbol.asyncIterator]();
-  expect((await iterator.next()).value).toBe('first');
-  await vi.advanceTimersByTimeAsync(9000);
-  expect(requests[0].signal.aborted).toBe(false);
-  controller.enqueue(encoder.encode(`${event('second')}data: [DONE]\n\n`)); controller.close();
-  expect((await iterator.next()).value).toBe('second');
-  expect((await iterator.next()).done).toBe(true);
-  expect(requests).toHaveLength(1);
-});
-
-test('cancelling a pending primary call aborts it without starting OpenAI', async () => {
-  vi.useFakeTimers();
-  const controller = new AbortController();
-  const requests = transport(stalled);
-  const result = collect(controller.signal);
-  const rejection = expect(result).rejects.toThrow();
-  await vi.advanceTimersByTimeAsync(1);
-  controller.abort();
-  await rejection;
-  expect(requests).toHaveLength(1);
-  expect(requests[0].signal.aborted).toBe(true);
-});
-
-test('an expired overall deadline never starts either provider', async () => {
-  const controller = new AbortController(); controller.abort();
-  const requests = transport(() => reply());
-  await expect(collect(controller.signal)).rejects.toThrow();
-  expect(requests).toHaveLength(0);
-});
-
-test('successful fallback preserves SSE content/DONE and accounts only emitted backup chunks', async () => {
-  const requests = transport((_request, index) => index ? reply('backup') : failure());
-  const account = vi.fn(async () => {});
-  const handle = createChatRoute({ ...chatServices, limit: async () => 'allowed', account });
-  const response = await handle(new Request('https://plonguo.com/api/chat', { method: 'POST',
-    headers: { Origin: 'https://plonguo.com', 'Content-Type': 'application/json' }, body: JSON.stringify(body) }));
-  expect(response.status).toBe(200);
-  expect(await response.text()).toBe('data: {"content":"backup"}\n\ndata: [DONE]\n\n');
-  expect(account).toHaveBeenCalledWith('unknown', 'test-session', 1);
-  expect(requests).toHaveLength(2);
-});
-
-test('a Supabase limiter outage still blocks both model providers', async () => {
-  const requests = transport(() => reply());
-  const handle = createChatRoute({ ...chatServices, limit: async () => 'unavailable' });
-  const response = await handle(new Request('https://plonguo.com/api/chat', { method: 'POST',
-    headers: { Origin: 'https://plonguo.com', 'Content-Type': 'application/json' }, body: JSON.stringify(body) }));
-  expect(response.status).toBe(503);
-  expect(requests).toHaveLength(0);
-});
-
-test('empty fallback is an error rather than a successful empty reply', async () => {
-  const requests = transport((_request, index) => index ? reply('') : failure());
-  await expect(collect()).rejects.toThrow('Chat service unavailable');
-  expect(requests).toHaveLength(2);
-});
-
-test('stopping consumption after first content cancels the upstream without fallback', async () => {
-  const requests = transport(() => reply());
-  const source = await chatServices.stream(body, new AbortController().signal);
-  for await (const chunk of source) { expect(chunk).toBe('reply'); break; }
-  expect(requests).toHaveLength(1);
-  expect(requests[0].signal.aborted).toBe(true);
-});
-
-test('overall cancellation during pending OpenAI fallback cancels its request without retry', async () => {
-  vi.useFakeTimers();
-  const controller = new AbortController();
-  const requests = transport((request, index) => index ? stalled(request) : failure());
-  const result = collect(controller.signal);
-  const rejection = expect(result).rejects.toThrow();
-  await vi.advanceTimersByTimeAsync(1);
-  expect(requests).toHaveLength(2);
-  controller.abort();
-  await rejection;
-  expect(requests[1].signal.aborted).toBe(true);
-  expect(requests).toHaveLength(2);
-});
-
-test('cancelling after OpenAI content aborts upstream and accounts only its emitted chunk', async () => {
-  const requests = transport((request, index) => index === 0 ? failure() : new Response(new ReadableStream({ start(controller) {
-    controller.enqueue(encoder.encode(event('backup partial')));
-    request.signal.addEventListener('abort', () => controller.error(new DOMException('Aborted', 'AbortError')), { once: true });
-  } }), { headers: { 'Content-Type': 'text/event-stream' } }));
-  const account = vi.fn(async () => {});
-  const controller = new AbortController();
-  const handle = createChatRoute({ ...chatServices, limit: async () => 'allowed', account });
-  const response = await handle(new Request('https://plonguo.com/api/chat', { method: 'POST', signal: controller.signal,
-    headers: { Origin: 'https://plonguo.com', 'Content-Type': 'application/json' }, body: JSON.stringify(body) }));
-  const reader = response.body!.getReader();
-  expect(new TextDecoder().decode((await reader.read()).value)).toBe('data: {"content":"backup partial"}\n\n');
-  controller.abort();
-  expect(new TextDecoder().decode((await reader.read()).value)).toBe('data: {"error":"Stream interrupted"}\n\n');
-  expect((await reader.read()).done).toBe(true);
-  expect(requests).toHaveLength(2);
-  expect(requests[1].signal.aborted).toBe(true);
-  expect(account).toHaveBeenCalledWith('unknown', 'test-session', 1);
+test('real SDK usage cannot produce DONE when quota settlement fails', async () => {
+  const { fetcher } = transport(() => reply()); vi.stubGlobal('fetch', fetcher);
+  const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+  try {
+    const response = await createChatRoute({ ...chatServices, admit: admission, settle: async () => { throw new Error('private database detail'); } })(makeRequest());
+    const content = await response.text(); expect(content).toContain('"content":"reply"');
+    expect(content).toContain('Stream interrupted'); expect(content).not.toContain('[DONE]');
+    expect(content).not.toContain('private database detail');
+  } finally { log.mockRestore(); }
 });

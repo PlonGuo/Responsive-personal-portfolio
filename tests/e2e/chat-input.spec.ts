@@ -1,13 +1,14 @@
 import { expect, test } from '@playwright/test';
+import { uiReply } from '../helpers/ui-stream';
 
 for (const event of [{ isComposing: true, keyCode: 13 }, { isComposing: false, keyCode: 229 }]) {
   test(`IME confirmation preserves the draft without sending (composing=${event.isComposing}, code=${event.keyCode})`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.route(/^https:\/\/(cdn\.simpleicons\.org|challenges\.cloudflare\.com)\//, route => route.abort());
     let requests = 0;
-    await page.route('**/api/chat', route => {
+    await page.route('**/api/chat/v2', route => {
       requests++;
-      return route.fulfill({ contentType: 'text/event-stream', body: 'data: {"content":"Input accepted."}\n\ndata: [DONE]\n\n' });
+      return route.fulfill({ contentType: 'text/event-stream', body: uiReply('Input accepted.') });
     });
     await page.goto('/zh');
     await page.getByRole('button', { name: '打开聊天助手' }).click();

@@ -12,29 +12,14 @@ export interface Message {
 
 // Chat state types
 export interface ChatState {
-  messages: Message[];
   isOpen: boolean;
-  isLoading: boolean;
   input: string;
   sessionId: string;
   messageCount: number;
   turnstileToken: string | null;
   needsVerification: boolean;
-  error: UIErrorCode | null;
-}
-
-// API request/response types
-export interface ChatRequest {
-  message: string;
-  sessionId: string;
-  history: Array<{ role: string; content: string }>;
-  turnstileToken?: string;
-}
-
-export interface ChatError {
-  error: string;
-  code: 'RATE_LIMIT' | 'VALIDATION' | 'VERIFICATION_FAILED' | 'SERVER_ERROR';
-  details?: string;
+  // Model messages, status and errors belong to SDK Chat, not the session store.
+  localError: UIErrorCode | null;
 }
 
 // Turnstile types

@@ -16,14 +16,13 @@ export interface SessionState {
 }
 export function createSessionState(sessionId: string): SessionState {
   return {
-    chat: { messages: [], isOpen: false, isLoading: false, input: '', sessionId,
-      messageCount: 0, turnstileToken: null, needsVerification: false, error: null },
+    chat: { isOpen: false, input: '', sessionId,
+      messageCount: 0, turnstileToken: null, needsVerification: false, localError: null },
     contact: { formData: { name: '', email: '', subject: '', message: '' }, status: 'idle', errorCode: null, verificationVersion: 0 },
     theme: 'light',
   };
 }
 const serverSnapshot = createSessionState('');
-Object.freeze(serverSnapshot.chat.messages);
 Object.freeze(serverSnapshot.chat);
 Object.freeze(serverSnapshot.contact.formData);
 Object.freeze(serverSnapshot.contact);
